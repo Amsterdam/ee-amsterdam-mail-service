@@ -1,0 +1,18 @@
+services:
+  mail-service:
+    image: amsterdam/amsterdam-mail-service:latest
+    build:
+      context: .
+      dockerfile: Containerfile
+    command: ["yarn", "run", "start:dev"]
+    environment:
+      NODE_ENV: development
+    ports:
+      - "3001:3001"
+    volumes:
+      - ".:/app"
+    networks:
+      - amsterdam-mail-service
+
+networks:
+    amsterdam-mail-service:
