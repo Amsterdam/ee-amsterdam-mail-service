@@ -78,5 +78,14 @@ services:
     networks:
       - amsterdam-mail-service
 
+  collector:
+    image: otel/opentelemetry-collector-contrib:0.138.0
+    ports:
+      - "4317:4317"
+    volumes:
+      - ./docker/otel-collector/otel-collector-config-dev.yaml:/etc/otelcol-contrib/config.yaml
+    networks:
+      - amsterdam-mail-service
+
 networks:
     amsterdam-mail-service:
