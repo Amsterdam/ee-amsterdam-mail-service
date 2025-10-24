@@ -71,5 +71,12 @@ services:
       retries: 10
       start_period: 30s
 
+  emulator.vault.azure.net:
+    image: ghcr.io/rokeller/azure-keyvault-emulator:v2.1.1
+    ports:
+      - "11001:11001"
+    networks:
+      - amsterdam-mail-service
+
 networks:
     amsterdam-mail-service:
