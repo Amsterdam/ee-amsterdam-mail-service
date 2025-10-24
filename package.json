@@ -2,9 +2,9 @@
   "name": "ee-amsterdam-mail-service",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": "Youri Westerman <y.westerman@amsterdam.nl> (https://github.com/Amsterdam)",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "EUPL-1.2",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
