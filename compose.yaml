@@ -8,8 +8,9 @@ services:
     command: ["yarn", "run", "start:dev"]
     environment:
       NODE_ENV: development
+      NODE_OPTIONS: --require @opentelemetry/auto-instrumentations-node/register --trace-deprecation
     ports:
-      - "3001:3001"
+      - "3000:3000"
     volumes:
       - ".:/app"
     networks:
