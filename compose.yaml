@@ -6,9 +6,7 @@ services:
       context: .
       dockerfile: Containerfile
     command: ["yarn", "run", "start:dev"]
-    environment:
-      NODE_ENV: development
-      NODE_OPTIONS: --require @opentelemetry/auto-instrumentations-node/register --trace-deprecation
+    env_file: .env
     ports:
       - "3000:3000"
     volumes:
