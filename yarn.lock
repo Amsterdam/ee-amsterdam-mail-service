@@ -2839,10 +2839,10 @@
   dependencies:
     marked "^15.0.12"
 
-"@react-email/preview-server@4.3.1":
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/@react-email/preview-server/-/preview-server-4.3.1.tgz#d9014022138a93e967d32f6885a9cb11d4d9e8a0"
-  integrity sha512-3YdkWMCy5PyMLT/ShbGfmZ0qbYGE+IlMG1PkSe2KEvv+NUC0j3XFrk17Ej4VHZZ5ecR+pezuMSm5W7IX34GGyw==
+"@react-email/preview-server@4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@react-email/preview-server/-/preview-server-4.3.2.tgz#bc07900113fbb863e2ad7ed1af0e8f07012cd464"
+  integrity sha512-rBm2AJhOhfi8Fd8MAFN4DQ0FQtsqq38JjJIWvbHA0EYwbjNwODmtzRZCkbdp+8o6GL5PKiRcikF0FDzbOYAJ+w==
   dependencies:
     "@babel/core" "7.26.10"
     "@babel/parser" "7.27.0"
