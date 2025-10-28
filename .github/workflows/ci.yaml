@@ -1,0 +1,41 @@
+name: CI
+on: [pull_request]
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install deps
+        run: yarn install
+
+      - name: Lint
+        run: yarn run lint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Copy env example
+        run: cp .env.example .env
+
+      - name: start containers
+        run: |
+          docker compose build mail-service keycloak
+          docker compose up -d keycloak mailpit emulator.vault.azure.net
+
+      - name: Run tests
+        run: docker compose run --rm mail-service yarn run test
