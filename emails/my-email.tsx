@@ -13,7 +13,6 @@ import {
   Text,
 } from "@react-email/components";
 import * as React from "react";
-import { ConfigModule } from "@nestjs/config";
 
 interface EmailProps {
   title: string;
@@ -63,14 +62,9 @@ export default function Email(props: EmailProps) {
   );
 }
 
-async function getBaseUrl(): Promise<string> {
-  await ConfigModule.envVariablesLoaded;
-  return process.env.BASE_URL || "http://localhost:3001";
-}
-
 Email.PreviewProps = {
   title: "My Email Title",
   previewText: "A nice preview text for mail clients",
   bodyText: "A quick brown fox jumps over the lazy dog.",
-  imageSrc: `${await getBaseUrl()}/amsterdam-logo.png`,
+  imageSrc: "/amsterdam-logo.png",
 };
