@@ -1,7 +1,7 @@
-import React from "react";
-import { render } from "@react-email/render";
-import Email from "../emails/my-email";
-import { Injectable } from "@nestjs/common";
+import React from 'react';
+import { render } from '@react-email/render';
+import Email from '../emails/my-email';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export default class PreviewRenderer {

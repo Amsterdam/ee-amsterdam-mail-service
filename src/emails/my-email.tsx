@@ -11,8 +11,8 @@ import {
   Preview,
   Section,
   Text,
-} from "@react-email/components";
-import * as React from "react";
+} from '@react-email/components';
+import * as React from 'react';
 
 interface EmailProps {
   title: string;
@@ -63,8 +63,8 @@ export default function Email(props: EmailProps) {
 }
 
 Email.PreviewProps = {
-  title: "My Email Title",
-  previewText: "A nice preview text for mail clients",
-  bodyText: "A quick brown fox jumps over the lazy dog.",
-  imageSrc: "/amsterdam-logo.png",
+  title: 'My Email Title',
+  previewText: 'A nice preview text for mail clients',
+  bodyText: 'A quick brown fox jumps over the lazy dog.',
+  imageSrc: '/amsterdam-logo.png',
 };
