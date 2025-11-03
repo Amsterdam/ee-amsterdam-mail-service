@@ -7,4 +7,5 @@ const presetConfig = createDefaultEsmPreset({
 
 export default {
   ...presetConfig,
+  rootDir: "src"
 } satisfies Config
