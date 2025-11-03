@@ -31,7 +31,7 @@
     "noEmitHelpers": true,
     "noUncheckedIndexedAccess": true,
     "outDir": "./dist",
-    "baseUrl": "./src",
+    "baseUrl": "./",
     "incremental": true,
     "strict": true,
     "strictNullChecks": true,
@@ -41,12 +41,12 @@
     "experimentalSpecifierResolution": "node",
     "transpileOnly": true,
     "esm": true,
-},
+  },
   "include": [
     "src/**/*",
+    "test/**/*"
   ],
   "exclude": [
-    "node_modules",
-    "**/*.spec.ts"
+    "node_modules"
   ]
 }
