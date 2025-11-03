@@ -39,3 +39,6 @@ jobs:
 
       - name: Run tests
         run: docker compose run --rm mail-service yarn run test
+
+      - name: Run E2E tests
+        run: docker compose run --rm mail-service yarn run test:e2e
