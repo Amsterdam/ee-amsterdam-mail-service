@@ -6,7 +6,7 @@ COPY entrypoint.sh /
 
 ADD package.json yarn.lock /app
 
-RUN yarn install --immutable --production
+RUN yarn install --immutable --production && yarn cache clean
 
 COPY . /app
 
