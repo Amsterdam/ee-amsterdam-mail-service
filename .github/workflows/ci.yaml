@@ -35,7 +35,7 @@ jobs:
       - name: start containers
         run: |
           docker compose build mail-service keycloak
-          docker compose up -d keycloak mailpit emulator.vault.azure.net mail-service
+          docker compose up -d keycloak mailpit emulator.vault.azure.net
 
       - name: Run tests
         run: docker compose run --rm mail-service yarn run test
