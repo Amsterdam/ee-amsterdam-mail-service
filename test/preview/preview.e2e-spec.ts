@@ -3,7 +3,7 @@ import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import type { App } from 'supertest/types';
 import { AppModule } from 'src/app.module';
-import { beforeEach, describe, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('PreviewController (e2e)', () => {
   let app: INestApplication<App>;
@@ -17,18 +17,17 @@ describe('PreviewController (e2e)', () => {
     await app.init();
   });
 
-  it('/preview (POST)', () => {
-    return request(app.getHttpServer())
-      .post('/preview')
-      .send({
-        title: 'My titleMy Title',
-        previewText: 'My Preview Text',
-        bodyText: 'My Body Text',
-      })
-      .expect(200)
-      .expect(
-        /* eslint-disable no-irregular-whitespace */
-        `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  it('/preview (POST)', async () => {
+    const response = await request(app.getHttpServer()).post('/preview').send({
+      title: 'My Title',
+      previewText: 'My Preview Text',
+      bodyText: 'My Body Text',
+    });
+
+    expect(response.statusCode).toEqual(200);
+    expect(response.text).toEqual(
+      /* eslint-disable no-irregular-whitespace */
+      `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html dir="ltr" lang="en">
   <head>
     <link rel="preload" as="image" href="/amsterdam-logo.png" />
@@ -156,7 +155,7 @@ describe('PreviewController (e2e)', () => {
   </body>
 </html>
 `,
-        /* eslint-enable */
-      );
+      /* eslint-enable */
+    );
   });
 });
