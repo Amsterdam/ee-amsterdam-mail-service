@@ -1,4 +1,5 @@
 import PreviewRenderer from './preview';
+import { describe, it, expect } from 'vitest';
 
 describe('PreviewRenderer', () => {
   describe('preview', () => {
