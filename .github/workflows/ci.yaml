@@ -30,15 +30,21 @@ jobs:
       - uses: docker/setup-buildx-action@v3
 
       - name: Copy env example
-        run: cp .env.example .env
+        run: cp .env.test .env
 
       - name: start containers
         run: |
           docker compose build mail-service keycloak
-          docker compose up -d keycloak mailpit emulator.vault.azure.net
+          docker compose up -d keycloak mailpit emulator.vault.azure.net mail-service
+
+      - name: Yarn install
+        run: docker compose exec mail-service yarn install
+
+      - name: Set NODE_OPTIONS
+        run: docker compose exec mail-service export NODE_OPTIONS="--experimental-loader=@opentelemetry/instrumentation/hook.mjs --import ./src/telemetry.ts --trace-deprecation"
 
       - name: Run tests
-        run: docker compose run --rm mail-service yarn run test
+        run: docker compose exec mail-service yarn run test
 
       - name: Run E2E tests
         run: docker compose run --rm mail-service yarn run test:e2e
