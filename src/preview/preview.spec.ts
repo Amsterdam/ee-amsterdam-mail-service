@@ -5,7 +5,7 @@ import { describe, it, expect } from 'vitest';
 describe('PreviewRenderer', () => {
   describe('preview', () => {
     it('should render a preview', async () => {
-      const previewer = new PreviewRenderer();
+      const previewer = new PreviewRenderer('http://localhost:3001');
       const preview = await previewer.preview(
         'My Title',
         'My Preview Text',
