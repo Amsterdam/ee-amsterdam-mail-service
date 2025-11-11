@@ -1415,7 +1415,7 @@
   resolved "https://registry.yarnpkg.com/@opentelemetry/context-async-hooks/-/context-async-hooks-2.2.0.tgz#5465f6fad6350f52cf9d95a92907a3a464d50644"
   integrity sha512-qRkLWiUEZNAmYapZ7KGS5C4OmBLcP/H2foXeOEaowYCR0wi89fHejrfYfbuLVCMLp/dWZXKvQusdbUEZjERfwQ==
 
-"@opentelemetry/core@2.2.0", "@opentelemetry/core@^2.0.0":
+"@opentelemetry/core@2.2.0", "@opentelemetry/core@^2.0.0", "@opentelemetry/core@^2.2.0":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@opentelemetry/core/-/core-2.2.0.tgz#2f857d7790ff160a97db3820889b5f4cade6eaee"
   integrity sha512-FuabnnUm8LflnieVxs6eP7Z383hgQU4W1e3KJS6aOG3RxWxcHyBxH8fDMHNgu/gFx/M2jvTOW/4/PHhLz6bjWw==
@@ -7873,7 +7873,7 @@ webpack@5.100.2:
     watchpack "^2.4.1"
     webpack-sources "^3.3.3"
 
-webpack@^5:
+webpack@^5, webpack@^5.0.0:
   version "5.102.1"
   resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.102.1.tgz#1003a3024741a96ba99c37431938bf61aad3d988"
   integrity sha512-7h/weGm9d/ywQ6qzJ+Xy+r9n/3qgp/thalBbpOi5i223dPXKi04IBtqPN9nTd+jBc7QKfvDbaBnFipYp4sJAUQ==
