@@ -8,6 +8,8 @@ ADD package.json yarn.lock /app
 
 RUN yarn install --immutable --production && yarn cache clean
 
+ENV NODE_OPTIONS="--experimental-loader=@opentelemetry/instrumentation/hook.mjs --import ./src/telemetry.ts --trace-deprecation"
+
 COPY . /app
 
 ENTRYPOINT ["/entrypoint.sh"]
