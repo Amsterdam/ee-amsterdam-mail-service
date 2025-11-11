@@ -29,6 +29,7 @@
     "@opentelemetry/core": "^2.2.0",
     "@react-email/components": "0.5.7",
     "class-validator": "^0.14.2",
+    "joi": "^18.0.1",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "reflect-metadata": "^0.2.2",
