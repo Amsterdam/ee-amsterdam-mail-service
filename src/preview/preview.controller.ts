@@ -1,7 +1,7 @@
 import { Body, Controller, HttpCode, Post } from '@nestjs/common';
-import { PreviewRequestDto } from './preview.dto.js';
+import { PreviewRequestDto } from './preview.dto';
 import { ApiOkResponse } from '@nestjs/swagger';
-import PreviewRenderer from './preview.js';
+import PreviewRenderer from './preview';
 
 @Controller('preview')
 export class PreviewController {
