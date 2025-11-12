@@ -8,8 +8,9 @@ import Joi from 'joi';
   imports: [
     ConfigModule.forRoot({
       ignoreEnvFile: true,
+      isGlobal: true,
       validationSchema: Joi.object({
-        BASE_URL: Joi.string().uri().default('http://localhost:3001'),
+        APP_BASE_URL: Joi.string().uri().default('http://localhost:3001'),
         NODE_ENV: Joi.string()
           .valid('development', 'production')
           .default('development'),
@@ -37,7 +38,7 @@ import Joi from 'joi';
       provide: PreviewRenderer,
       inject: [ConfigService],
       useFactory: (configuration: ConfigService): PreviewRenderer => {
-        const baseUrl = configuration.get<string>('BASE_URL');
+        const baseUrl = configuration.get<string>('APP_BASE_URL');
         return new PreviewRenderer(baseUrl);
       },
     },
