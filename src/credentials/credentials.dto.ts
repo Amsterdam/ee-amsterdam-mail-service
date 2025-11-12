@@ -19,3 +19,12 @@ export class CredentialsResponseDto {
   // @ts-expect-error TS2564
   message: string;
 }
+
+export class CredentialsResponseDtoFactory {
+  public produce(message: string): CredentialsResponseDto {
+    const response = new CredentialsResponseDto();
+    response.message = message;
+
+    return response;
+  }
+}

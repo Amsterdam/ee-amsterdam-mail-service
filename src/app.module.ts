@@ -16,6 +16,7 @@ import CredentialsRepository from './repositories';
 import { SecretClient } from '@azure/keyvault-secrets';
 import { DefaultAzureCredential } from '@azure/identity';
 import type { TokenCredential } from '@azure/identity';
+import { CredentialsResponseDtoFactory } from './credentials/credentials.dto';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import type { TokenCredential } from '@azure/identity';
   controllers: [CredentialsController, PreviewController],
   providers: [
     ConfigService,
+    CredentialsResponseDtoFactory,
     {
       provide: PreviewRenderer,
       inject: [ConfigService],
@@ -155,6 +157,7 @@ import type { TokenCredential } from '@azure/identity';
 
         if (process.env.NODE_ENV != 'production') {
           credential = {
+            // eslint-disable-next-line @typescript-eslint/require-await
             getToken: async () => {
               return {
                 token:

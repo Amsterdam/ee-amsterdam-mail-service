@@ -3,12 +3,16 @@ import { CredentialsUpserter } from './credentials';
 import {
   CredentialsRequestDto,
   CredentialsResponseDto,
+  CredentialsResponseDtoFactory,
 } from './credentials.dto';
 import { ApiBody, ApiResponse } from '@nestjs/swagger';
 
 @Controller('credentials')
 export class CredentialsController {
-  public constructor(private upserter: CredentialsUpserter) {}
+  public constructor(
+    private upserter: CredentialsUpserter,
+    private responseDtoFactory: CredentialsResponseDtoFactory,
+  ) {}
 
   @Post()
   @HttpCode(200)
@@ -23,9 +27,8 @@ export class CredentialsController {
       credentialsRequestDto.password,
     );
 
-    const response = new CredentialsResponseDto();
-    response.message = 'SMTP credentials successfully stored in keyvault!';
-
-    return response;
+    return this.responseDtoFactory.produce(
+      'SMTP credentials successfully stored in keyvault!',
+    );
   }
 }
