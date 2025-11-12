@@ -3,6 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PreviewController } from './preview/preview.controller';
 import PreviewRenderer from './preview/preview';
 import Joi from 'joi';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -29,6 +31,9 @@ import Joi from 'joi';
           .required(),
         PORT: Joi.number().port().default(3001),
       }),
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(import.meta.dirname, '..', 'public'),
     }),
   ],
   controllers: [PreviewController],
