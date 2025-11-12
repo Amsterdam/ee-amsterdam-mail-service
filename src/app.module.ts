@@ -5,6 +5,8 @@ import PreviewRenderer from './preview/preview';
 import Joi from 'joi';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { JwtModule, JwtSecretRequestType } from '@nestjs/jwt';
+import * as jwt from 'jsonwebtoken';
 
 @Module({
   imports: [
@@ -30,10 +32,50 @@ import { join } from 'path';
           })
           .required(),
         PORT: Joi.number().port().default(3001),
+        OIDC_ISSUER: Joi.string().default(
+          'http://localhost:8002/realms/amsterdam-mail-service',
+        ),
+        OIDC_AUDIENCE: Joi.string().default('amsterdam-mail-service'),
+        OIDC_ALGORITHMS: Joi.string().default('RS256,RS384,RS512'),
       }),
     }),
     ServeStaticModule.forRoot({
       rootPath: join(import.meta.dirname, '..', 'public'),
+    }),
+    JwtModule.registerAsync({
+      useFactory: (configuration: ConfigService) => {
+        // @ts-expect-error TS2345
+        const algorithms: jwt.Algorithm[] = configuration
+          .get<string>('OIDC_ALGORITHMS')
+          .split(',');
+
+        return {
+          global: true,
+          secretOrKeyProvider: (
+            requestType: JwtSecretRequestType,
+            // @ts-expect-error TS6133
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            tokenOrPayload: string | object | Buffer,
+            // @ts-expect-error TS6133
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            verifyOrSignOrOptions?: jwt.VerifyOptions | jwt.SignOptions,
+          ) => {
+            if (requestType !== JwtSecretRequestType.VERIFY) {
+              throw new Error('Only verifying is supported!');
+            }
+
+            // TODO: Get public key
+
+            return 'HELLO';
+          },
+          verifyOptions: {
+            algorithms: algorithms,
+            audience: configuration.get<string>('OIDC_AUDIENCE'),
+            issuer: configuration.get<string>('OIDC_ISSUER'),
+          },
+        };
+      },
+      inject: [ConfigService],
     }),
   ],
   controllers: [PreviewController],
