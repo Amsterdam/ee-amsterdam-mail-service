@@ -37,6 +37,9 @@ import * as jwt from 'jsonwebtoken';
         ),
         OIDC_AUDIENCE: Joi.string().default('amsterdam-mail-service'),
         OIDC_ALGORITHMS: Joi.string().default('RS256,RS384,RS512'),
+        OIDC_DISCOVERY_URL: Joi.string()
+          .uri()
+          .default('http://localhost:8002/realms/amsterdam-mail-service/.well-known/openid-configuration'),
       }),
     }),
     ServeStaticModule.forRoot({

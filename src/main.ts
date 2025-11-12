@@ -10,6 +10,11 @@ async function bootstrap() {
     .setDescription('The mail service for sending transactional mail.')
     .setVersion('1.0')
     .addTag('mail')
+    .addOAuth2({
+      type: 'openIdConnect',
+      openIdConnectUrl: process.env.OIDC_DISCOVERY_URL ??
+       'http://localhost:8002/realms/amsterdam-mail-service/.well-known/openid-configuration',
+    })
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
