@@ -1,11 +1,9 @@
 import React from 'react';
 import { render } from '@react-email/render';
 import Email from '../emails/my-email';
-import { Injectable } from '@nestjs/common';
 
-@Injectable()
 export default class PreviewRenderer {
-  public constructor() {}
+  public constructor(private baseUrl: string) {}
 
   public async preview(
     title: string,
@@ -17,7 +15,7 @@ export default class PreviewRenderer {
         title={title}
         previewText={previewText}
         bodyText={bodyText}
-        imageSrc="/amsterdam-logo.png"
+        imageSrc={`${this.baseUrl}/amsterdam-logo.png`}
       />,
       { pretty: true },
     );
