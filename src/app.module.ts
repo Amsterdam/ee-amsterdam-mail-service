@@ -24,6 +24,9 @@ import type { TokenCredential } from '@azure/identity';
       isGlobal: true,
       validationSchema: Joi.object({
         APP_BASE_URL: Joi.string().uri().default('http://localhost:3001'),
+        KEYVAULT_URL: Joi.string()
+          .uri()
+          .default('https://emulator.vault.azure.net:11001'),
         NODE_ENV: Joi.string()
           .valid('development', 'production')
           .default('development'),
@@ -147,7 +150,7 @@ import type { TokenCredential } from '@azure/identity';
       provide: SecretClient,
       inject: [ConfigService],
       useFactory: (configuration: ConfigService): SecretClient => {
-        const keyvaultUrl = '';
+        const keyvaultUrl = configuration.get<string>('KEYVAULT_URL');
         let credential: TokenCredential = new DefaultAzureCredential();
 
         if (process.env.NODE_ENV != 'production') {
@@ -162,6 +165,7 @@ import type { TokenCredential } from '@azure/identity';
           };
         }
 
+        // @ts-expect-error TS2345
         return new SecretClient(keyvaultUrl, credential);
       },
     },
