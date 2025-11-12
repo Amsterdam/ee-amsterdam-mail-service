@@ -44,6 +44,7 @@ import { join } from 'path';
       inject: [ConfigService],
       useFactory: (configuration: ConfigService): PreviewRenderer => {
         const baseUrl = configuration.get<string>('APP_BASE_URL');
+        // @ts-expect-error TS2345
         return new PreviewRenderer(baseUrl);
       },
     },

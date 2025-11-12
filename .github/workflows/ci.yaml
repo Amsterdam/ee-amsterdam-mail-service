@@ -22,6 +22,23 @@ jobs:
       - name: Lint
         run: yarn run lint
 
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install deps
+        run: yarn install
+
+      - name: Type check
+        run: yarn run build
+
   test:
     runs-on: ubuntu-latest
     steps:
