@@ -6,7 +6,7 @@ import Joi from 'joi';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import OktaJwtVerifier, { type VerifierOptions } from '@okta/jwt-verifier';
-import { JWKSUriResolver } from './auth';
+import { JWKSUriResolver, JWTHeaderVerifier } from './auth';
 import { AuthGuard } from './auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -45,6 +45,7 @@ import { APP_GUARD } from '@nestjs/core';
             'http://keycloak:8002/realms/amsterdam-mail-service/.well-known/openid-configuration',
           ),
         OIDC_CLIENT_ID: Joi.string().default('amsterdam-mail-service'),
+        OIDC_CHECK_TYP_HEADER: Joi.boolean().default(true),
         SWAGGER_UI_OIDC_DISCOVERY_URL: Joi.string()
           .uri()
           .default(
@@ -105,13 +106,26 @@ import { APP_GUARD } from '@nestjs/core';
       },
     },
     {
+      provide: JWTHeaderVerifier,
+      inject: [ConfigService],
+      useFactory: (configuration: ConfigService): JWTHeaderVerifier => {
+        return new JWTHeaderVerifier(
+          // @ts-expect-error TS2345
+          configuration.get<string>('OIDC_ALGORITHMS'),
+          configuration.get<boolean>('OIDC_CHECK_TYP_HEADER'),
+        );
+      },
+    },
+    {
       provide: APP_GUARD,
-      inject: [ConfigService, OktaJwtVerifier],
+      inject: [ConfigService, JWTHeaderVerifier, OktaJwtVerifier],
       useFactory: (
         configuration: ConfigService,
+        headerVerifier: JWTHeaderVerifier,
         jwtVerifier: OktaJwtVerifier,
       ): AuthGuard => {
         return new AuthGuard(
+          headerVerifier,
           jwtVerifier,
           // @ts-expect-error TS2345
           configuration.get<string>('OIDC_AUDIENCE'),

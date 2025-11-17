@@ -1,12 +1,12 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import type { CanActivate, ExecutionContext } from '@nestjs/common';
 import type { Jwt } from '@okta/jwt-verifier';
 import type OktaJwtVerifier from '@okta/jwt-verifier';
 import type { Request } from 'express';
+import {
+  InvalidAuthorizationHeaderException,
+  type JWTHeaderVerifier,
+} from './auth';
 
 declare module 'express-serve-static-core' {
   interface Request {
@@ -17,6 +17,7 @@ declare module 'express-serve-static-core' {
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
+    private headerVerifier: JWTHeaderVerifier,
     private jwtVerifier: OktaJwtVerifier,
     private expectedAudience: string,
   ) {}
@@ -25,7 +26,8 @@ export class AuthGuard implements CanActivate {
     const request: Request = context.switchToHttp().getRequest();
     const authorization = request.headers.authorization;
     if (authorization === undefined || !authorization.startsWith('Bearer ')) {
-      // TODO
+      // TODO Make sure we translate this exception to a proper response using middleware
+
       /* response.status(400);
       response.appendHeader("WWW-Authenticate", [
         "Bearer",
@@ -33,21 +35,14 @@ export class AuthGuard implements CanActivate {
         'error="invalid_request"',
         'error_description="No bearer token provided"',
       ]); */
-      throw new BadRequestException('No bearer token provided');
+      throw new InvalidAuthorizationHeaderException(
+        'No bearer token provided!',
+      );
     }
 
     const token = authorization.substring(7);
 
-    // TODO: Check typ (token) header
-    /*     response.status(400);
-    response.appendHeader("WWW-Authenticate", [
-      "Bearer",
-      'realm="amsterdam-mail-service"',
-      'error="invalid_request"',
-      'error_description="The typ header is invalid"',
-    ]); */
-
-    // TODO: Check alg header
+    this.headerVerifier.verify(token);
 
     try {
       const jwt = await this.jwtVerifier.verifyAccessToken(
