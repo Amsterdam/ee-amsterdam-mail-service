@@ -30,7 +30,7 @@ import { join } from 'path';
           })
           .required(),
         PORT: Joi.number().port().default(3001),
-        OIDC_ISSUER: Joi.string().default(
+        OIDC_ISSUER: Joi.string().uri().default(
           'http://localhost:8002/realms/amsterdam-mail-service',
         ),
         OIDC_AUDIENCE: Joi.string().default('amsterdam-mail-service'),
