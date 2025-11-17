@@ -7,6 +7,8 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import OktaJwtVerifier, { type VerifierOptions } from '@okta/jwt-verifier';
 import { JWKSUriResolver } from './auth';
+import { AuthGuard } from './auth.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -100,6 +102,20 @@ import { JWKSUriResolver } from './auth';
         }
 
         return new OktaJwtVerifier(verifierOptions);
+      },
+    },
+    {
+      provide: APP_GUARD,
+      inject: [ConfigService, OktaJwtVerifier],
+      useFactory: (
+        configuration: ConfigService,
+        jwtVerifier: OktaJwtVerifier,
+      ): AuthGuard => {
+        return new AuthGuard(
+          jwtVerifier,
+          // @ts-expect-error TS2345
+          configuration.get<string>('OIDC_AUDIENCE'),
+        );
       },
     },
   ],
