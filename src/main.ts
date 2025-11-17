@@ -12,8 +12,9 @@ async function bootstrap() {
     .addTag('mail')
     .addOAuth2({
       type: 'openIdConnect',
-      openIdConnectUrl: process.env.OIDC_DISCOVERY_URL ??
-       'http://localhost:8002/realms/amsterdam-mail-service/.well-known/openid-configuration',
+      openIdConnectUrl:
+        process.env.SWAGGER_UI_OIDC_DISCOVERY_URL ??
+        'http://localhost:8002/realms/amsterdam-mail-service/.well-known/openid-configuration',
     })
     .build();
 
