@@ -31,7 +31,6 @@ export class JWKSUriResolver {
 }
 
 export class AuthException extends Error {}
-export class InvalidAuthorizationHeaderException extends AuthException {}
 export class InvalidJwtHeaderException extends AuthException {}
 export class InvalidTypHeaderException extends InvalidJwtHeaderException {}
 export class InvalidAlgHeaderException extends InvalidJwtHeaderException {}
