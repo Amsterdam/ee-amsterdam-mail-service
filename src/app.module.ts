@@ -38,6 +38,7 @@ import { join } from 'path';
         OIDC_DISCOVERY_URL: Joi.string()
           .uri()
           .default('http://localhost:8002/realms/amsterdam-mail-service/.well-known/openid-configuration'),
+        OIDC_CLIENT_ID: Joi.string().default('amsterdam-mail-service'),
       }),
     }),
     ServeStaticModule.forRoot({
