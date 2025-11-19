@@ -6,6 +6,7 @@ import { AppModule } from 'src/app.module';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { readFileSync } from 'fs';
 import {
+  getToken,
   test_expired_token,
   test_invalid_alg_header,
   test_invalid_audience,
@@ -58,24 +59,29 @@ describe('PreviewController (e2e)', () => {
     await test_invalid_signature(app, url, requestBody);
   });
 
-  it('It should not generate a preview with authentication enabled and a invalid issuer in the access token', async () => {
+  it('It should not generate a preview a invalid issuer in the access token', async () => {
     await test_invalid_issuer(app, url, requestBody);
   });
 
-  // it('/preview (POST)', async () => {
-  //   const response = await request(app.getHttpServer()).post('/preview').send({
-  //     title: 'My Title',
-  //     previewText: 'My Preview Text',
-  //     bodyText: 'My Body Text',
-  //   });
+  it('It should generate a preview with a valid token', async () => {
+    const tokenResponse = await getToken();
 
-  //   expect(response.statusCode).toEqual(200);
+    const response = await request(app.getHttpServer())
+      .post('/preview')
+      .send({
+        title: 'My Title',
+        previewText: 'My Preview Text',
+        bodyText: 'My Body Text',
+      })
+      .set('Authorization', `Bearer ${tokenResponse.body.access_token}`);
 
-  //   const expectedPreviewResponseBody = readFileSync(
-  //     './test/resources/previewResponse.html',
-  //     { encoding: 'utf-8' },
-  //   );
+    expect(response.statusCode).toEqual(200);
 
-  //   expect(response.text).toEqual(expectedPreviewResponseBody);
-  // });
+    const expectedPreviewResponseBody = readFileSync(
+      './test/resources/previewResponse.html',
+      { encoding: 'utf-8' },
+    );
+
+    expect(response.text).toEqual(expectedPreviewResponseBody);
+  });
 });
