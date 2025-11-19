@@ -156,8 +156,6 @@ export const test_invalid_signature = async (
 export const test_invalid_issuer = async (
   app: INestApplication<App>,
   url: string,
-  test_client_id: string,
-  test_client_secret: string,
   requestBody: object,
 ) => {
   const tokenResponse = await superagent
@@ -175,7 +173,7 @@ export const test_invalid_issuer = async (
 
   expect(response.statusCode).toEqual(401);
   expect(response.headers['www-authenticate']).toEqual(
-    'Bearer, realm="amsterdam-mail-service", error="invalid_token", error_description="Error: issuer http://iam:8002/realms/amsterdam-mail-service does not match expected issuer: http://keycloak:8002/realms/amsterdam-mail-service"',
+    'Bearer, realm="amsterdam-mail-service", error="invalid_token", error_description="Error: issuer http://iam:8002/realms/amsterdam-mail-service does not match expected issuer: http://localhost:8002/realms/amsterdam-mail-service"',
   );
   expect(response.text).toEqual('Unauthorized');
 };

@@ -9,6 +9,7 @@ import {
   test_expired_token,
   test_invalid_alg_header,
   test_invalid_audience,
+  test_invalid_issuer,
   test_invalid_signature,
   test_invalid_typ_header,
   test_no_token_provided,
@@ -55,6 +56,10 @@ describe('PreviewController (e2e)', () => {
 
   it('It should not generate a preview and a invalid signature in the access token', async () => {
     await test_invalid_signature(app, url, requestBody);
+  });
+
+  it('It should not generate a preview with authentication enabled and a invalid issuer in the access token', async () => {
+    await test_invalid_issuer(app, url, requestBody);
   });
 
   // it('/preview (POST)', async () => {
