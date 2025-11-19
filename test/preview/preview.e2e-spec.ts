@@ -9,6 +9,9 @@ import {
   assertIsTokenResponseBody,
   getToken,
   test_expired_token,
+  test_header_missing_alg,
+  test_header_missing_alg_and_typ,
+  test_header_missing_typ,
   test_invalid_alg_header,
   test_invalid_audience,
   test_invalid_issuer,
@@ -38,6 +41,18 @@ describe('PreviewController (e2e)', () => {
 
   it('It should not generate a preview with no token provided', async () => {
     await test_no_token_provided(app, url, requestBody);
+  });
+
+  it('It should not generate a preview with typ missing from header', async () => {
+    await test_header_missing_typ(app, url, requestBody);
+  });
+
+  it('It should not generate a preview with alg missing from header', async () => {
+    await test_header_missing_alg(app, url, requestBody);
+  });
+
+  it('It should not generate a preview with alg and typ missing from header', async () => {
+    await test_header_missing_alg_and_typ(app, url, requestBody);
   });
 
   it('It should not generate a preview with a invalid typ header in the access token', async () => {

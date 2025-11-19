@@ -32,6 +32,7 @@ export class JWKSUriResolver {
 
 export class AuthException extends Error {}
 export class InvalidJwtHeaderException extends AuthException {}
+export class MalformedJwtHeaderException extends InvalidJwtHeaderException {}
 export class InvalidTypHeaderException extends InvalidJwtHeaderException {}
 export class InvalidAlgHeaderException extends InvalidJwtHeaderException {}
 
@@ -42,7 +43,7 @@ export function assertIsJwtHeader(obj: any): asserts obj is JwtHeader {
     !('typ' in obj) ||
     !('alg' in obj)
   ) {
-    throw new InvalidJwtHeaderException(
+    throw new MalformedJwtHeaderException(
       'Header does not contain `typ` and/or `alg` properties!',
     );
   }
@@ -57,8 +58,7 @@ export class JWTHeaderVerifier {
   public verify(token: string): void {
     const [header, ,] = token.split('.');
     if (header === undefined) {
-      // TODO: Map response in middleware
-      throw new InvalidJwtHeaderException('Failed to get header from token!');
+      throw new MalformedJwtHeaderException('Failed to get header from token!');
     }
 
     const decodedHeader: unknown = JSON.parse(

@@ -8,6 +8,7 @@ import {
   AuthException,
   InvalidAlgHeaderException,
   InvalidTypHeaderException,
+  MalformedJwtHeaderException,
 } from './auth';
 import {
   ExpiredTokenException,
@@ -31,6 +32,16 @@ export class AuthExceptionFilter implements ExceptionFilter {
           'realm="amsterdam-mail-service"',
           'error="invalid_request"',
           'error_description="No bearer token provided"',
+        ])
+        .send('Bad request');
+    } else if (exception instanceof MalformedJwtHeaderException) {
+      response
+        .status(400)
+        .appendHeader('WWW-Authenticate', [
+          'Bearer',
+          'realm="amsterdam-mail-service"',
+          'error="invalid_request"',
+          'error_description="Invalid JWT header"',
         ])
         .send('Bad request');
     } else if (exception instanceof InvalidTypHeaderException) {

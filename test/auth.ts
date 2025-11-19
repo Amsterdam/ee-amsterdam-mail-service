@@ -36,6 +36,109 @@ export const test_no_token_provided = async (
   expect(response.text).toEqual('Bad request');
 };
 
+export const test_header_missing_typ = async (
+  app: INestApplication<App>,
+  url: string,
+  requestBody: object,
+) => {
+  const tokenResponse = await getToken();
+  const body: unknown = tokenResponse.body;
+  assertIsTokenResponseBody(body);
+
+  const token: string = body.access_token;
+  const [header, payload, signature] = token.split('.');
+
+  const decodedHeader: unknown = JSON.parse(
+    Buffer.from(header, 'base64').toString('utf-8'),
+  );
+  delete decodedHeader.typ;
+
+  const encodedHeader = Buffer.from(JSON.stringify(decodedHeader)).toString(
+    'base64',
+  );
+  const modifiedToken = `${encodedHeader}.${payload}.${signature}`;
+
+  const response = await request(app.getHttpServer())
+    .post(url)
+    .send(requestBody)
+    .set('Authorization', `Bearer ${modifiedToken}`);
+
+  expect(response.statusCode).toEqual(400);
+  expect(response.headers['www-authenticate']).toEqual(
+    'Bearer, realm="amsterdam-mail-service", error="invalid_request", error_description="Invalid JWT header"',
+  );
+  expect(response.text).toEqual('Bad request');
+};
+
+export const test_header_missing_alg = async (
+  app: INestApplication<App>,
+  url: string,
+  requestBody: object,
+) => {
+  const tokenResponse = await getToken();
+  const body: unknown = tokenResponse.body;
+  assertIsTokenResponseBody(body);
+
+  const token: string = body.access_token;
+  const [header, payload, signature] = token.split('.');
+
+  const decodedHeader: unknown = JSON.parse(
+    Buffer.from(header, 'base64').toString('utf-8'),
+  );
+  delete decodedHeader.alg;
+
+  const encodedHeader = Buffer.from(JSON.stringify(decodedHeader)).toString(
+    'base64',
+  );
+  const modifiedToken = `${encodedHeader}.${payload}.${signature}`;
+
+  const response = await request(app.getHttpServer())
+    .post(url)
+    .send(requestBody)
+    .set('Authorization', `Bearer ${modifiedToken}`);
+
+  expect(response.statusCode).toEqual(400);
+  expect(response.headers['www-authenticate']).toEqual(
+    'Bearer, realm="amsterdam-mail-service", error="invalid_request", error_description="Invalid JWT header"',
+  );
+  expect(response.text).toEqual('Bad request');
+};
+
+export const test_header_missing_alg_and_typ = async (
+  app: INestApplication<App>,
+  url: string,
+  requestBody: object,
+) => {
+  const tokenResponse = await getToken();
+  const body: unknown = tokenResponse.body;
+  assertIsTokenResponseBody(body);
+
+  const token: string = body.access_token;
+  const [header, payload, signature] = token.split('.');
+
+  const decodedHeader: unknown = JSON.parse(
+    Buffer.from(header, 'base64').toString('utf-8'),
+  );
+  delete decodedHeader.alg;
+  delete decodedHeader.typ;
+
+  const encodedHeader = Buffer.from(JSON.stringify(decodedHeader)).toString(
+    'base64',
+  );
+  const modifiedToken = `${encodedHeader}.${payload}.${signature}`;
+
+  const response = await request(app.getHttpServer())
+    .post(url)
+    .send(requestBody)
+    .set('Authorization', `Bearer ${modifiedToken}`);
+
+  expect(response.statusCode).toEqual(400);
+  expect(response.headers['www-authenticate']).toEqual(
+    'Bearer, realm="amsterdam-mail-service", error="invalid_request", error_description="Invalid JWT header"',
+  );
+  expect(response.text).toEqual('Bad request');
+};
+
 export const test_invalid_typ_header = async (
   app: INestApplication<App>,
   url: string,
