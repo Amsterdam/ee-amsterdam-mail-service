@@ -16,6 +16,7 @@ export class TokenException extends AuthException {}
 export class InvalidAudienceException extends TokenException {}
 export class ExpiredTokenException extends TokenException {}
 export class InvalidSignatureException extends TokenException {}
+export class InvalidIssuerException extends TokenException {}
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -58,6 +59,9 @@ export class AuthGuard implements CanActivate {
               `JwtParseError: ${error.message}`,
             );
           }
+        }
+        if (error.message.startsWith('issuer ')) {
+          throw new InvalidIssuerException(`${error.name}: ${error.message}`);
         }
       }
       throw new TokenException();

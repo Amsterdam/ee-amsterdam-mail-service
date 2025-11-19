@@ -153,31 +153,32 @@ export const test_invalid_signature = async (
   expect(response.text).toEqual('Unauthorized');
 };
 
-// export const test_invalid_issuer = async (
-//   url: string,
-//   test_client_id: string,
-//   test_client_secret: string,
-//   requestBody: object,
-// ) => {
-//   const tokenResponse = await superagent
-//     .post(
-//       "http://iam:8002/realms/amsterdam-mail-service/protocol/openid-connect/token",
-//     )
-//     .send(`client_id=${test_client_id}`)
-//     .send(`client_secret=${test_client_secret}`)
-//     .send("grant_type=client_credentials");
+export const test_invalid_issuer = async (
+  app: INestApplication<App>,
+  url: string,
+  test_client_id: string,
+  test_client_secret: string,
+  requestBody: object,
+) => {
+  const tokenResponse = await superagent
+    .post(
+      'http://iam:8002/realms/amsterdam-mail-service/protocol/openid-connect/token',
+    )
+    .send(`client_id=${test_client_id}`)
+    .send(`client_secret=${test_client_secret}`)
+    .send('grant_type=client_credentials');
 
-//   const response = await request(app)
-//     .post(url)
-//     .send(requestBody)
-//     .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+  const response = await request(app.getHttpServer())
+    .post(url)
+    .send(requestBody)
+    .set('Authorization', `Bearer ${tokenResponse.body.access_token}`);
 
-//   expect(response.statusCode).toEqual(401);
-//   expect(response.headers["www-authenticate"]).toEqual(
-//     'Bearer, realm="amsterdam-mail-service", error="invalid_token", error_description="Error: issuer http://iam:8002/realms/amsterdam-mail-service does not match expected issuer: http://keycloak:8002/realms/amsterdam-mail-service"',
-//   );
-//   expect(response.text).toEqual("Unauthorized");
-// };
+  expect(response.statusCode).toEqual(401);
+  expect(response.headers['www-authenticate']).toEqual(
+    'Bearer, realm="amsterdam-mail-service", error="invalid_token", error_description="Error: issuer http://iam:8002/realms/amsterdam-mail-service does not match expected issuer: http://keycloak:8002/realms/amsterdam-mail-service"',
+  );
+  expect(response.text).toEqual('Unauthorized');
+};
 
 export const getToken = async () => {
   return await superagent

@@ -13,6 +13,7 @@ import {
   ExpiredTokenException,
   InvalidAudienceException,
   InvalidAuthorizationHeaderException,
+  InvalidIssuerException,
   InvalidSignatureException,
 } from './auth.guard';
 
@@ -46,7 +47,8 @@ export class AuthExceptionFilter implements ExceptionFilter {
       exception instanceof InvalidAudienceException ||
       exception instanceof ExpiredTokenException ||
       exception instanceof InvalidAlgHeaderException ||
-      exception instanceof InvalidSignatureException
+      exception instanceof InvalidSignatureException ||
+      exception instanceof InvalidIssuerException
     ) {
       response
         .status(401)
