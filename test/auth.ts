@@ -98,37 +98,36 @@ export const test_expired_token = async (
   expect(response.text).toEqual('Unauthorized');
 };
 
-// export const test_invalid_alg_header = async (
-//   url: string,
-//   test_client_id: string,
-//   test_client_secret: string,
-//   requestBody: object,
-// ) => {
-//   const tokenResponse = await getToken();
-//   const token: string = tokenResponse.body.access_token;
-//   const [header, payload, signature] = token.split(".");
+export const test_invalid_alg_header = async (
+  app: INestApplication<App>,
+  url: string,
+  requestBody: object,
+) => {
+  const tokenResponse = await getToken();
+  const token: string = tokenResponse.body.access_token;
+  const [header, payload, signature] = token.split('.');
 
-//   const decodedHeader = JSON.parse(
-//     Buffer.from(header, "base64").toString("utf-8"),
-//   );
-//   decodedHeader.alg = "none";
+  const decodedHeader = JSON.parse(
+    Buffer.from(header, 'base64').toString('utf-8'),
+  );
+  decodedHeader.alg = 'none';
 
-//   const encodedHeader = Buffer.from(JSON.stringify(decodedHeader)).toString(
-//     "base64",
-//   );
-//   const modifiedToken = `${encodedHeader}.${payload}.${signature}`;
+  const encodedHeader = Buffer.from(JSON.stringify(decodedHeader)).toString(
+    'base64',
+  );
+  const modifiedToken = `${encodedHeader}.${payload}.${signature}`;
 
-//   const response = await request(app)
-//     .post(url)
-//     .send(requestBody)
-//     .set("Authorization", `Bearer ${modifiedToken}`);
+  const response = await request(app.getHttpServer())
+    .post(url)
+    .send(requestBody)
+    .set('Authorization', `Bearer ${modifiedToken}`);
 
-//   expect(response.statusCode).toEqual(401);
-//   expect(response.headers["www-authenticate"]).toEqual(
-//     'Bearer, realm="amsterdam-mail-service", error="invalid_token", error_description="JwtParseError: Unexpected signature algorithm"',
-//   );
-//   expect(response.text).toEqual("Unauthorized");
-// };
+  expect(response.statusCode).toEqual(401);
+  expect(response.headers['www-authenticate']).toEqual(
+    'Bearer, realm="amsterdam-mail-service", error="invalid_token", error_description="Alg not supported: none!"',
+  );
+  expect(response.text).toEqual('Unauthorized');
+};
 
 // export const test_invalid_signature = async (
 //   url: string,

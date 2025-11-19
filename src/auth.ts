@@ -64,7 +64,6 @@ export class JWTHeaderVerifier {
     }
 
     if (!this.allowedAlgorithms.includes(decodedHeader.alg)) {
-      // TODO: Map response in middleware
       throw new InvalidAlgHeaderException(
         `Alg not supported: ${decodedHeader.alg}!`,
       );
