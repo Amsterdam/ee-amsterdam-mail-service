@@ -6,6 +6,7 @@ import { AppModule } from 'src/app.module';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { readFileSync } from 'fs';
 import {
+  test_expired_token,
   test_invalid_audience,
   test_invalid_typ_header,
   test_no_token_provided,
@@ -40,6 +41,10 @@ describe('PreviewController (e2e)', () => {
 
   it('It should not generate a preview with authentication enabled and an invalid audience in the access token', async () => {
     await test_invalid_audience(app, url, requestBody);
+  });
+
+  it('It should not generate a preview with authentication enabled and an expired access token', async () => {
+    await test_expired_token(app, url, requestBody);
   });
 
   // it('/preview (POST)', async () => {

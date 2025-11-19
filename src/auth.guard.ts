@@ -14,6 +14,7 @@ declare module 'express-serve-static-core' {
 export class InvalidAuthorizationHeaderException extends AuthException {}
 export class TokenException extends AuthException {}
 export class InvalidAudienceException extends TokenException {}
+export class ExpiredTokenException extends TokenException {}
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -43,11 +44,15 @@ export class AuthGuard implements CanActivate {
       );
       request.jwt = jwt;
     } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message.startsWith('audience claim')
-      ) {
-        throw new InvalidAudienceException(`Error: ${error.message}`);
+      if (error instanceof Error) {
+        if (error.message.startsWith('audience claim')) {
+          throw new InvalidAudienceException(`Error: ${error.message}`);
+        }
+        if (error.name === 'JwtParseError') {
+          if (error.message === 'Jwt is expired') {
+            throw new ExpiredTokenException(`JwtParseError: ${error.message}`);
+          }
+        }
       }
       throw new TokenException();
     }

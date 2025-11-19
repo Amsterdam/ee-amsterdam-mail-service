@@ -6,6 +6,7 @@ import {
 import type { Response } from 'express';
 import { AuthException, InvalidTypHeaderException } from './auth';
 import {
+  ExpiredTokenException,
   InvalidAudienceException,
   InvalidAuthorizationHeaderException,
 } from './auth.guard';
@@ -37,6 +38,16 @@ export class AuthExceptionFilter implements ExceptionFilter {
         ])
         .send('Bad request');
     } else if (exception instanceof InvalidAudienceException) {
+      response
+        .status(401)
+        .appendHeader('WWW-Authenticate', [
+          'Bearer',
+          'realm="amsterdam-mail-service"',
+          'error="invalid_token"',
+          `error_description="${exception.message}"`,
+        ])
+        .send('Unauthorized');
+    } else if (exception instanceof ExpiredTokenException) {
       response
         .status(401)
         .appendHeader('WWW-Authenticate', [
