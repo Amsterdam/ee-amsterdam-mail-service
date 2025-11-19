@@ -3,9 +3,22 @@ import superagent from 'superagent';
 import { expect } from 'vitest';
 import type { INestApplication } from '@nestjs/common';
 import type { App } from 'supertest/types';
+import { assertIsJwtHeader } from 'src/auth';
 
 export const test_client_id = 'test-client';
 export const test_client_secret = 't7f4say1ARTe5BJ5N3VFCwqY06jJY7oA';
+
+interface TokenResponseBody {
+  access_token: string;
+}
+
+export function assertIsTokenResponseBody(
+  obj: any,
+): asserts obj is TokenResponseBody {
+  if (typeof obj !== 'object' || obj === null || !('access_token' in obj)) {
+    throw new Error('Token response malformed!');
+  }
+}
 
 export const test_no_token_provided = async (
   app: INestApplication<App>,
@@ -36,10 +49,13 @@ export const test_invalid_typ_header = async (
     .send('client_secret=S3iPjLlqgGRsRJaF8yByABHBfdvRjkSO')
     .send('grant_type=client_credentials');
 
+  const body: unknown = tokenResponse.body;
+  assertIsTokenResponseBody(body);
+
   const response = await request(app.getHttpServer())
     .post(url)
     .send(requestBody)
-    .set('Authorization', `Bearer ${tokenResponse.body.access_token}`);
+    .set('Authorization', `Bearer ${body.access_token}`);
 
   expect(response.statusCode).toEqual(400);
   expect(response.headers['www-authenticate']).toEqual(
@@ -61,10 +77,13 @@ export const test_invalid_audience = async (
     .send('client_secret=ticz9eg5MOmY4GRmSNwobHTYQWcy7Ll2')
     .send('grant_type=client_credentials');
 
+  const body: unknown = tokenResponse.body;
+  assertIsTokenResponseBody(body);
+
   const response = await request(app.getHttpServer())
     .post(url)
     .send(requestBody)
-    .set('Authorization', `Bearer ${tokenResponse.body.access_token}`);
+    .set('Authorization', `Bearer ${body.access_token}`);
 
   expect(response.statusCode).toEqual(401);
   expect(response.headers['www-authenticate']).toEqual(
@@ -86,10 +105,13 @@ export const test_expired_token = async (
     .send('client_secret=nrtOBWWsoXFvJdxp8uvnc0WZ1gKCh91J')
     .send('grant_type=client_credentials');
 
+  const body: unknown = tokenResponse.body;
+  assertIsTokenResponseBody(body);
+
   const response = await request(app.getHttpServer())
     .post(url)
     .send(requestBody)
-    .set('Authorization', `Bearer ${tokenResponse.body.access_token}`);
+    .set('Authorization', `Bearer ${body.access_token}`);
 
   expect(response.statusCode).toEqual(401);
   expect(response.headers['www-authenticate']).toEqual(
@@ -104,12 +126,16 @@ export const test_invalid_alg_header = async (
   requestBody: object,
 ) => {
   const tokenResponse = await getToken();
-  const token: string = tokenResponse.body.access_token;
+  const body: unknown = tokenResponse.body;
+  assertIsTokenResponseBody(body);
+
+  const token: string = body.access_token;
   const [header, payload, signature] = token.split('.');
 
-  const decodedHeader = JSON.parse(
+  const decodedHeader: unknown = JSON.parse(
     Buffer.from(header, 'base64').toString('utf-8'),
   );
+  assertIsJwtHeader(decodedHeader);
   decodedHeader.alg = 'none';
 
   const encodedHeader = Buffer.from(JSON.stringify(decodedHeader)).toString(
@@ -135,8 +161,10 @@ export const test_invalid_signature = async (
   requestBody: object,
 ) => {
   const tokenResponse = await getToken();
+  const body: unknown = tokenResponse.body;
+  assertIsTokenResponseBody(body);
 
-  const token: string = tokenResponse.body.access_token;
+  const token: string = body.access_token;
   const [header, payload, signature] = token.split('.');
 
   const modifiedToken = `${header}.${payload}.${signature.substring(0, signature.length - 5)}TEST`;
@@ -166,10 +194,13 @@ export const test_invalid_issuer = async (
     .send(`client_secret=${test_client_secret}`)
     .send('grant_type=client_credentials');
 
+  const body: unknown = tokenResponse.body;
+  assertIsTokenResponseBody(body);
+
   const response = await request(app.getHttpServer())
     .post(url)
     .send(requestBody)
-    .set('Authorization', `Bearer ${tokenResponse.body.access_token}`);
+    .set('Authorization', `Bearer ${body.access_token}`);
 
   expect(response.statusCode).toEqual(401);
   expect(response.headers['www-authenticate']).toEqual(

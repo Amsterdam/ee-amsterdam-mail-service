@@ -6,6 +6,7 @@ import { AppModule } from 'src/app.module';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { readFileSync } from 'fs';
 import {
+  assertIsTokenResponseBody,
   getToken,
   test_expired_token,
   test_invalid_alg_header,
@@ -65,6 +66,8 @@ describe('PreviewController (e2e)', () => {
 
   it('It should generate a preview with a valid token', async () => {
     const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
 
     const response = await request(app.getHttpServer())
       .post('/preview')
@@ -73,7 +76,7 @@ describe('PreviewController (e2e)', () => {
         previewText: 'My Preview Text',
         bodyText: 'My Body Text',
       })
-      .set('Authorization', `Bearer ${tokenResponse.body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(200);
 

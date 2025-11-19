@@ -35,14 +35,16 @@ export class InvalidJwtHeaderException extends AuthException {}
 export class InvalidTypHeaderException extends InvalidJwtHeaderException {}
 export class InvalidAlgHeaderException extends InvalidJwtHeaderException {}
 
-function assertIsJwtHeader(obj: any): asserts obj is JwtHeader {
+export function assertIsJwtHeader(obj: any): asserts obj is JwtHeader {
   if (
     typeof obj !== 'object' ||
     obj === null ||
     !('typ' in obj) ||
     !('alg' in obj)
   ) {
-    throw new Error('Header does not contain `typ` and/or `alg` properties!');
+    throw new InvalidJwtHeaderException(
+      'Header does not contain `typ` and/or `alg` properties!',
+    );
   }
 }
 
