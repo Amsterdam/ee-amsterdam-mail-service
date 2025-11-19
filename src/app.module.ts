@@ -9,7 +9,7 @@ import OktaJwtVerifier, { type VerifierOptions } from '@okta/jwt-verifier';
 import { JWKSUriResolver, JWTHeaderVerifier } from './auth';
 import { AuthGuard } from './auth.guard';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
-import { InvalidAuthorizationHeaderExceptionFilter } from './auth-exception.filter';
+import { AuthExceptionFilter } from './auth-exception.filter';
 
 @Module({
   imports: [
@@ -135,8 +135,8 @@ import { InvalidAuthorizationHeaderExceptionFilter } from './auth-exception.filt
     },
     {
       provide: APP_FILTER,
-      useClass: InvalidAuthorizationHeaderExceptionFilter,
-    }
+      useClass: AuthExceptionFilter,
+    },
   ],
 })
 export class AppModule {}

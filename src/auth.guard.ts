@@ -3,10 +3,7 @@ import type { CanActivate, ExecutionContext } from '@nestjs/common';
 import type { Jwt } from '@okta/jwt-verifier';
 import type OktaJwtVerifier from '@okta/jwt-verifier';
 import type { Request } from 'express';
-import {
-  AuthException,
-  type JWTHeaderVerifier,
-} from './auth';
+import { AuthException, type JWTHeaderVerifier } from './auth';
 
 declare module 'express-serve-static-core' {
   interface Request {

@@ -1,49 +1,52 @@
-import request from "supertest";
-import superagent from "superagent";
-import { expect } from "vitest";
-import type { INestApplication } from "@nestjs/common";
-import type { App } from "supertest/types";
+import request from 'supertest';
+import superagent from 'superagent';
+import { expect } from 'vitest';
+import type { INestApplication } from '@nestjs/common';
+import type { App } from 'supertest/types';
 
-export const test_client_id = "test-client";
-export const test_client_secret = "t7f4say1ARTe5BJ5N3VFCwqY06jJY7oA";
+export const test_client_id = 'test-client';
+export const test_client_secret = 't7f4say1ARTe5BJ5N3VFCwqY06jJY7oA';
 
 export const test_no_token_provided = async (
   app: INestApplication<App>,
   url: string,
   requestBody: object,
 ) => {
-  const response = await request(app.getHttpServer()).post(url).send(requestBody);
+  const response = await request(app.getHttpServer())
+    .post(url)
+    .send(requestBody);
 
   expect(response.statusCode).toEqual(400);
-  expect(response.headers["www-authenticate"]).toEqual(
+  expect(response.headers['www-authenticate']).toEqual(
     'Bearer, realm="amsterdam-mail-service", error="invalid_request", error_description="No bearer token provided"',
   );
-  expect(response.text).toEqual("Bad request");
+  expect(response.text).toEqual('Bad request');
 };
 
-// export const test_invalid_typ_header = async (
-//   url: string,
-//   requestBody: object,
-// ) => {
-//   const tokenResponse = await superagent
-//     .post(
-//       "http://keycloak:8002/realms/amsterdam-mail-service/protocol/openid-connect/token",
-//     )
-//     .send("client_id=test-client-with-JWT-typ-header")
-//     .send("client_secret=S3iPjLlqgGRsRJaF8yByABHBfdvRjkSO")
-//     .send("grant_type=client_credentials");
+export const test_invalid_typ_header = async (
+  app: INestApplication<App>,
+  url: string,
+  requestBody: object,
+) => {
+  const tokenResponse = await superagent
+    .post(
+      'http://keycloak:8002/realms/amsterdam-mail-service/protocol/openid-connect/token',
+    )
+    .send('client_id=test-client-with-JWT-typ-header')
+    .send('client_secret=S3iPjLlqgGRsRJaF8yByABHBfdvRjkSO')
+    .send('grant_type=client_credentials');
 
-//   const response = await request(app)
-//     .post(url)
-//     .send(requestBody)
-//     .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+  const response = await request(app.getHttpServer())
+    .post(url)
+    .send(requestBody)
+    .set('Authorization', `Bearer ${tokenResponse.body.access_token}`);
 
-//   expect(response.statusCode).toEqual(400);
-//   expect(response.headers["www-authenticate"]).toEqual(
-//     'Bearer, realm="amsterdam-mail-service", error="invalid_request", error_description="The typ header is invalid"',
-//   );
-//   expect(response.text).toEqual("Bad request");
-// };
+  expect(response.statusCode).toEqual(400);
+  expect(response.headers['www-authenticate']).toEqual(
+    'Bearer, realm="amsterdam-mail-service", error="invalid_request", error_description="The typ header is invalid"',
+  );
+  expect(response.text).toEqual('Bad request');
+};
 
 // export const test_invalid_audience = async (
 //   url: string,
@@ -176,9 +179,9 @@ export const test_no_token_provided = async (
 export const getToken = async () => {
   return await superagent
     .post(
-      "http://keycloak:8002/realms/amsterdam-mail-service/protocol/openid-connect/token",
+      'http://keycloak:8002/realms/amsterdam-mail-service/protocol/openid-connect/token',
     )
     .send(`client_id=${test_client_id}`)
     .send(`client_secret=${test_client_secret}`)
-    .send("grant_type=client_credentials");
+    .send('grant_type=client_credentials');
 };

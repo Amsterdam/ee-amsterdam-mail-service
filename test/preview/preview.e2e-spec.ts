@@ -5,14 +5,14 @@ import type { App } from 'supertest/types';
 import { AppModule } from 'src/app.module';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { readFileSync } from 'fs';
-import { test_no_token_provided } from 'test/auth';
+import { test_invalid_typ_header, test_no_token_provided } from 'test/auth';
 
 const requestBody = {
-  title: "My Title",
-  previewText: "My preview text",
-  bodyText: "# Body text\n- list1\n- list2",
+  title: 'My Title',
+  previewText: 'My preview text',
+  bodyText: '# Body text\n- list1\n- list2',
 };
-const url = "/preview";
+const url = '/preview';
 
 describe('PreviewController (e2e)', () => {
   let app: INestApplication<App>;
@@ -26,8 +26,12 @@ describe('PreviewController (e2e)', () => {
     await app.init();
   });
 
-  it("It should not generate a preview with authentication enabled and no token provided", async () => {
+  it('It should not generate a preview with authentication enabled and no token provided', async () => {
     await test_no_token_provided(app, url, requestBody);
+  });
+
+  it('It should not store credentials with a invalid typ header in the access token', async () => {
+    await test_invalid_typ_header(app, url, requestBody);
   });
 
   // it('/preview (POST)', async () => {

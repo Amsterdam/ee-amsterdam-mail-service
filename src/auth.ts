@@ -44,6 +44,7 @@ export class JWTHeaderVerifier {
   public verify(token: string): void {
     const [header, ,] = token.split('.');
     if (header === undefined) {
+      // TODO
       throw new InvalidJwtHeaderException('Failed to get header from token!');
     }
 
