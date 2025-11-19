@@ -15,6 +15,7 @@ export class InvalidAuthorizationHeaderException extends AuthException {}
 export class TokenException extends AuthException {}
 export class InvalidAudienceException extends TokenException {}
 export class ExpiredTokenException extends TokenException {}
+export class InvalidSignatureException extends TokenException {}
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -51,6 +52,11 @@ export class AuthGuard implements CanActivate {
         if (error.name === 'JwtParseError') {
           if (error.message === 'Jwt is expired') {
             throw new ExpiredTokenException(`JwtParseError: ${error.message}`);
+          }
+          if (error.message === 'Signature verification failed') {
+            throw new InvalidSignatureException(
+              `JwtParseError: ${error.message}`,
+            );
           }
         }
       }

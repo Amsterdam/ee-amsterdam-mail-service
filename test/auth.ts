@@ -129,30 +129,29 @@ export const test_invalid_alg_header = async (
   expect(response.text).toEqual('Unauthorized');
 };
 
-// export const test_invalid_signature = async (
-//   url: string,
-//   test_client_id: string,
-//   test_client_secret: string,
-//   requestBody: object,
-// ) => {
-//   const tokenResponse = await getToken();
+export const test_invalid_signature = async (
+  app: INestApplication<App>,
+  url: string,
+  requestBody: object,
+) => {
+  const tokenResponse = await getToken();
 
-//   const token: string = tokenResponse.body.access_token;
-//   const [header, payload, signature] = token.split(".");
+  const token: string = tokenResponse.body.access_token;
+  const [header, payload, signature] = token.split('.');
 
-//   const modifiedToken = `${header}.${payload}.${signature.substring(0, signature.length - 5)}TEST`;
+  const modifiedToken = `${header}.${payload}.${signature.substring(0, signature.length - 5)}TEST`;
 
-//   const response = await request(app)
-//     .post(url)
-//     .send(requestBody)
-//     .set("Authorization", `Bearer ${modifiedToken}`);
+  const response = await request(app.getHttpServer())
+    .post(url)
+    .send(requestBody)
+    .set('Authorization', `Bearer ${modifiedToken}`);
 
-//   expect(response.statusCode).toEqual(401);
-//   expect(response.headers["www-authenticate"]).toEqual(
-//     'Bearer, realm="amsterdam-mail-service", error="invalid_token", error_description="JwtParseError: Signature verification failed"',
-//   );
-//   expect(response.text).toEqual("Unauthorized");
-// };
+  expect(response.statusCode).toEqual(401);
+  expect(response.headers['www-authenticate']).toEqual(
+    'Bearer, realm="amsterdam-mail-service", error="invalid_token", error_description="JwtParseError: Signature verification failed"',
+  );
+  expect(response.text).toEqual('Unauthorized');
+};
 
 // export const test_invalid_issuer = async (
 //   url: string,

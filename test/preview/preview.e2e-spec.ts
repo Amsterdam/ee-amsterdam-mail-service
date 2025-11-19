@@ -9,6 +9,7 @@ import {
   test_expired_token,
   test_invalid_alg_header,
   test_invalid_audience,
+  test_invalid_signature,
   test_invalid_typ_header,
   test_no_token_provided,
 } from 'test/auth';
@@ -40,16 +41,20 @@ describe('PreviewController (e2e)', () => {
     await test_invalid_typ_header(app, url, requestBody);
   });
 
-  it('It should not generate a preview with authentication enabled and an invalid audience in the access token', async () => {
+  it('It should not generate a preview with an invalid audience in the access token', async () => {
     await test_invalid_audience(app, url, requestBody);
   });
 
-  it('It should not generate a preview with authentication enabled and an expired access token', async () => {
+  it('It should not generate a preview with an expired access token', async () => {
     await test_expired_token(app, url, requestBody);
   });
 
-  it('It should not generate a preview with authentication enabled and a invalid alg header in the access token', async () => {
+  it('It should not generate a preview with a invalid alg header in the access token', async () => {
     await test_invalid_alg_header(app, url, requestBody);
+  });
+
+  it('It should not generate a preview and a invalid signature in the access token', async () => {
+    await test_invalid_signature(app, url, requestBody);
   });
 
   // it('/preview (POST)', async () => {

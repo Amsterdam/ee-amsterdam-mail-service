@@ -13,6 +13,7 @@ import {
   ExpiredTokenException,
   InvalidAudienceException,
   InvalidAuthorizationHeaderException,
+  InvalidSignatureException,
 } from './auth.guard';
 
 @Catch(AuthException)
@@ -44,7 +45,8 @@ export class AuthExceptionFilter implements ExceptionFilter {
     } else if (
       exception instanceof InvalidAudienceException ||
       exception instanceof ExpiredTokenException ||
-      exception instanceof InvalidAlgHeaderException
+      exception instanceof InvalidAlgHeaderException ||
+      exception instanceof InvalidSignatureException
     ) {
       response
         .status(401)
