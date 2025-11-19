@@ -35,6 +35,17 @@ export class InvalidJwtHeaderException extends AuthException {}
 export class InvalidTypHeaderException extends InvalidJwtHeaderException {}
 export class InvalidAlgHeaderException extends InvalidJwtHeaderException {}
 
+function assertIsJwtHeader(obj: any): asserts obj is JwtHeader {
+  if (
+    typeof obj !== 'object' ||
+    obj === null ||
+    !('typ' in obj) ||
+    !('alg' in obj)
+  ) {
+    throw new Error('Header does not contain `typ` and/or `alg` properties!');
+  }
+}
+
 export class JWTHeaderVerifier {
   public constructor(
     private allowedAlgorithms: string[],
@@ -48,9 +59,10 @@ export class JWTHeaderVerifier {
       throw new InvalidJwtHeaderException('Failed to get header from token!');
     }
 
-    const decodedHeader: JwtHeader = JSON.parse(
+    const decodedHeader: unknown = JSON.parse(
       Buffer.from(header, 'base64').toString('utf-8'),
     );
+    assertIsJwtHeader(decodedHeader);
 
     if (this.checkTypHeader) {
       if (
