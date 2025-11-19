@@ -5,7 +5,11 @@ import type { App } from 'supertest/types';
 import { AppModule } from 'src/app.module';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { readFileSync } from 'fs';
-import { test_invalid_typ_header, test_no_token_provided } from 'test/auth';
+import {
+  test_invalid_audience,
+  test_invalid_typ_header,
+  test_no_token_provided,
+} from 'test/auth';
 
 const requestBody = {
   title: 'My Title',
@@ -32,6 +36,10 @@ describe('PreviewController (e2e)', () => {
 
   it('It should not generate a preview with a invalid typ header in the access token', async () => {
     await test_invalid_typ_header(app, url, requestBody);
+  });
+
+  it('It should not generate a preview with authentication enabled and an invalid audience in the access token', async () => {
+    await test_invalid_audience(app, url, requestBody);
   });
 
   // it('/preview (POST)', async () => {

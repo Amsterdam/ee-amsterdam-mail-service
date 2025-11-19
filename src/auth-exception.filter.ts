@@ -5,7 +5,10 @@ import {
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { AuthException, InvalidTypHeaderException } from './auth';
-import { InvalidAuthorizationHeaderException } from './auth.guard';
+import {
+  InvalidAudienceException,
+  InvalidAuthorizationHeaderException,
+} from './auth.guard';
 
 @Catch(AuthException)
 export class AuthExceptionFilter implements ExceptionFilter {
@@ -33,6 +36,16 @@ export class AuthExceptionFilter implements ExceptionFilter {
           'error_description="The typ header is invalid"',
         ])
         .send('Bad request');
+    } else if (exception instanceof InvalidAudienceException) {
+      response
+        .status(401)
+        .appendHeader('WWW-Authenticate', [
+          'Bearer',
+          'realm="amsterdam-mail-service"',
+          'error="invalid_token"',
+          `error_description="${exception.message}"`,
+        ])
+        .send('Unauthorized');
     }
   }
 }

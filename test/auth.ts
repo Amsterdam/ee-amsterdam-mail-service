@@ -48,29 +48,30 @@ export const test_invalid_typ_header = async (
   expect(response.text).toEqual('Bad request');
 };
 
-// export const test_invalid_audience = async (
-//   url: string,
-//   requestBody: object,
-// ) => {
-//   const tokenResponse = await superagent
-//     .post(
-//       "http://keycloak:8002/realms/amsterdam-mail-service/protocol/openid-connect/token",
-//     )
-//     .send("client_id=test-client-with-incorrect-audience")
-//     .send("client_secret=ticz9eg5MOmY4GRmSNwobHTYQWcy7Ll2")
-//     .send("grant_type=client_credentials");
+export const test_invalid_audience = async (
+  app: INestApplication<App>,
+  url: string,
+  requestBody: object,
+) => {
+  const tokenResponse = await superagent
+    .post(
+      'http://keycloak:8002/realms/amsterdam-mail-service/protocol/openid-connect/token',
+    )
+    .send('client_id=test-client-with-incorrect-audience')
+    .send('client_secret=ticz9eg5MOmY4GRmSNwobHTYQWcy7Ll2')
+    .send('grant_type=client_credentials');
 
-//   const response = await request(app)
-//     .post(url)
-//     .send(requestBody)
-//     .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+  const response = await request(app.getHttpServer())
+    .post(url)
+    .send(requestBody)
+    .set('Authorization', `Bearer ${tokenResponse.body.access_token}`);
 
-//   expect(response.statusCode).toEqual(401);
-//   expect(response.headers["www-authenticate"]).toEqual(
-//     'Bearer, realm="amsterdam-mail-service", error="invalid_token", error_description="Error: audience claims test-audience, account do not include expected audience: amsterdam-mail-service"',
-//   );
-//   expect(response.text).toEqual("Unauthorized");
-// };
+  expect(response.statusCode).toEqual(401);
+  expect(response.headers['www-authenticate']).toEqual(
+    'Bearer, realm="amsterdam-mail-service", error="invalid_token", error_description="Error: audience claims test-audience, account do not include expected audience: amsterdam-mail-service"',
+  );
+  expect(response.text).toEqual('Unauthorized');
+};
 
 // export const test_expired_token = async (url: string, requestBody: object) => {
 //   const tokenResponse = await superagent

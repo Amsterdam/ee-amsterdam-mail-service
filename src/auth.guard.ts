@@ -13,6 +13,7 @@ declare module 'express-serve-static-core' {
 
 export class InvalidAuthorizationHeaderException extends AuthException {}
 export class TokenException extends AuthException {}
+export class InvalidAudienceException extends TokenException {}
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -42,15 +43,12 @@ export class AuthGuard implements CanActivate {
       );
       request.jwt = jwt;
     } catch (error) {
-      /* response.appendHeader("WWW-Authenticate", [
-        "Bearer",
-        'realm="amsterdam-mail-service"',
-        'error="invalid_token"',
-        `error_description="${err}"`,
-      ]);
-      response.status(401).send("Unauthorized"); */
-      // TODO: Handle and expose different failures so we can provide appropriate responses
-      console.error(error);
+      if (
+        error instanceof Error &&
+        error.message.startsWith('audience claim')
+      ) {
+        throw new InvalidAudienceException(`Error: ${error.message}`);
+      }
       throw new TokenException();
     }
 

@@ -44,7 +44,7 @@ export class JWTHeaderVerifier {
   public verify(token: string): void {
     const [header, ,] = token.split('.');
     if (header === undefined) {
-      // TODO
+      // TODO: Map response in middleware
       throw new InvalidJwtHeaderException('Failed to get header from token!');
     }
 
@@ -60,18 +60,10 @@ export class JWTHeaderVerifier {
         throw new InvalidTypHeaderException(
           `Invalid typ header: ${decodedHeader.typ}`,
         );
-        // response.status(400);
-        // response.appendHeader("WWW-Authenticate", [
-        //   "Bearer",
-        //   'realm="amsterdam-mail-service"',
-        //   'error="invalid_request"',
-        //   'error_description="The typ header is invalid"',
-        // ]);
-        // return next("Bad request");
       }
     }
 
-    if (!(decodedHeader.alg in this.allowedAlgorithms)) {
+    if (!this.allowedAlgorithms.includes(decodedHeader.alg)) {
       // TODO: Map response in middleware
       throw new InvalidAlgHeaderException(
         `Alg not supported: ${decodedHeader.alg}!`,
