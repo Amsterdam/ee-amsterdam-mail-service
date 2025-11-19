@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post, Req } from '@nestjs/common';
 import { CredentialsUpserter } from './credentials';
 import {
   CredentialsRequestDto,
@@ -6,6 +6,7 @@ import {
   CredentialsResponseDtoFactory,
 } from './credentials.dto';
 import { ApiBody, ApiResponse } from '@nestjs/swagger';
+import type { Request } from 'express';
 
 @Controller('credentials')
 export class CredentialsController {
@@ -19,10 +20,11 @@ export class CredentialsController {
   @ApiBody({ type: CredentialsRequestDto })
   @ApiResponse({ type: CredentialsResponseDto })
   public async credentials(
+    @Req() request: Request,
     @Body() credentialsRequestDto: CredentialsRequestDto,
   ): Promise<CredentialsResponseDto> {
     await this.upserter.upsert(
-      'abc', // TODO: Get this value from access token
+      request.jwt.claims.sub,
       credentialsRequestDto.username,
       credentialsRequestDto.password,
     );
