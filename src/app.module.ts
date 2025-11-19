@@ -112,7 +112,7 @@ import { AuthExceptionFilter } from './auth-exception.filter';
       useFactory: (configuration: ConfigService): JWTHeaderVerifier => {
         return new JWTHeaderVerifier(
           // @ts-expect-error TS2345
-          configuration.get<string>('OIDC_ALGORITHMS'),
+          configuration.get<string>('OIDC_ALGORITHMS').split(','),
           configuration.get<boolean>('OIDC_CHECK_TYP_HEADER'),
         );
       },
