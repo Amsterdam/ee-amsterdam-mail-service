@@ -14,7 +14,7 @@ import { AuthExceptionFilter } from './auth-exception.filter';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      ignoreEnvFile: true,
+      envFilePath: ['.env.test', '.env'],
       isGlobal: true,
       validationSchema: Joi.object({
         APP_BASE_URL: Joi.string().uri().default('http://localhost:3001'),
