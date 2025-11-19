@@ -26,11 +26,11 @@ describe('PreviewController (e2e)', () => {
     await app.init();
   });
 
-  it('It should not generate a preview with authentication enabled and no token provided', async () => {
+  it('It should not generate a preview with no token provided', async () => {
     await test_no_token_provided(app, url, requestBody);
   });
 
-  it('It should not store credentials with a invalid typ header in the access token', async () => {
+  it('It should not generate a preview with a invalid typ header in the access token', async () => {
     await test_invalid_typ_header(app, url, requestBody);
   });
 
