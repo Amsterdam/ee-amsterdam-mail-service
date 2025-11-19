@@ -7,7 +7,7 @@ import { AuthException, type JWTHeaderVerifier } from './auth';
 
 declare module 'express-serve-static-core' {
   interface Request {
-    jwt?: Jwt;
+    jwt: Jwt;
   }
 }
 
