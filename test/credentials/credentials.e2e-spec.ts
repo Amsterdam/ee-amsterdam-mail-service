@@ -18,6 +18,7 @@ import {
   test_no_token_provided,
 } from 'test/auth';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { SecretClient } from '@azure/keyvault-secrets';
 
 const requestBody = {
   username: 'test_smtp_user',
@@ -45,6 +46,35 @@ function assertIsValidationResponseBody(
   }
 }
 
+interface ValidResponseBody {
+  message: string;
+}
+
+function assertIsValidResponseBody(obj: any): asserts obj is ValidResponseBody {
+  if (typeof obj !== 'object' || obj === null || !('message' in obj)) {
+    throw new Error('Is not a valid resonse body!');
+  }
+}
+
+const deleteCredentials = async (client: SecretClient) => {
+  try {
+    const poller = await client.beginDeleteSecret(
+      'ccd03ed4-6873-422f-828b-38a39e358fc9-smtpUser',
+    );
+    await poller.pollUntilDone();
+  } catch (err) {
+    console.error(err);
+  }
+  try {
+    const poller = await client.beginDeleteSecret(
+      'ccd03ed4-6873-422f-828b-38a39e358fc9-smtpPass',
+    );
+    await poller.pollUntilDone();
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 describe('CredentialsController (e2e)', () => {
   let app: INestApplication<App>;
 
@@ -58,35 +88,41 @@ describe('CredentialsController (e2e)', () => {
     await app.init();
   });
 
-  //   it("It should store credentials with a valid token", async () => {
-  //     const tokenResponse = await getToken();
+  it('It should store credentials with a valid token', async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
 
-  //     const response = await request(app)
-  //       .post(url)
-  //       .send(requestBody)
-  //       .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send(requestBody)
+      .set('Authorization', `Bearer ${body.access_token}`);
 
-  //     expect(response.statusCode).toEqual(200);
-  //     expect(response.body).toHaveProperty("message");
-  //     expect(response.body.message).toEqual(
-  //       "SMTP credentials successfully stored in keyvault!",
-  //     );
+    expect(response.statusCode).toEqual(200);
 
-  //     const client = getSecretClient();
-  //     const smtpUserResponse = await client.getSecret(
-  //       "ccd03ed4-6873-422f-828b-38a39e358fc9-smtpUser",
-  //     );
+    const responseBody: unknown = response.body;
+    assertIsValidResponseBody(responseBody);
 
-  //     expect(smtpUserResponse.value).toEqual(requestBody.username);
+    expect(responseBody).toHaveProperty('message');
+    expect(responseBody.message).toEqual(
+      'SMTP credentials successfully stored in keyvault!',
+    );
 
-  //     const smtpPassResponse = await client.getSecret(
-  //       "ccd03ed4-6873-422f-828b-38a39e358fc9-smtpPass",
-  //     );
+    const client = app.get(SecretClient);
+    const smtpUserResponse = await client.getSecret(
+      'ccd03ed4-6873-422f-828b-38a39e358fc9-smtpUser',
+    );
 
-  //     expect(smtpPassResponse.value).toEqual(requestBody.password);
+    expect(smtpUserResponse.value).toEqual(requestBody.username);
 
-  //     await delete_credentials();
-  //   });
+    const smtpPassResponse = await client.getSecret(
+      'ccd03ed4-6873-422f-828b-38a39e358fc9-smtpPass',
+    );
+
+    expect(smtpPassResponse.value).toEqual(requestBody.password);
+
+    await deleteCredentials(client);
+  });
 
   it('It should not store credentials with no token provided', async () => {
     await test_no_token_provided(app, url, requestBody);
