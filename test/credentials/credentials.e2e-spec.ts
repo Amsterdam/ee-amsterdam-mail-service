@@ -1,5 +1,5 @@
 import request from 'supertest';
-import type { INestApplication } from '@nestjs/common';
+import { ValidationPipe, type INestApplication } from '@nestjs/common';
 import { Test, type TestingModule } from '@nestjs/testing';
 import { AppModule } from 'src/app.module';
 import type { App } from 'supertest/types';
@@ -24,7 +24,7 @@ const requestBody = {
 };
 const url = '/credentials';
 
-describe('PreviewController (e2e)', () => {
+describe('CredentialsController (e2e)', () => {
   let app: INestApplication<App>;
 
   beforeEach(async () => {
@@ -33,6 +33,7 @@ describe('PreviewController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe());
     await app.init();
   });
 
@@ -106,28 +107,25 @@ describe('PreviewController (e2e)', () => {
     await test_invalid_issuer(app, url, requestBody);
   });
 
-  //   it("username missing", async () => {
-  //     const tokenResponse = await getToken();
+  it('username missing', async () => {
+    const tokenResponse = await getToken();
 
-  //     const response = await request(app)
-  //       .post(url)
-  //       .send({
-  //         password: "password",
-  //       })
-  //       .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send({
+        password: 'password',
+      })
+      .set('Authorization', `Bearer ${tokenResponse.body.access_token}`);
 
-  //     expect(response.statusCode).toEqual(422);
-  //     expect(response.body).toHaveProperty("errors");
-  //     expect(response.body.errors).toHaveLength(1);
-  //     expect(response.body.errors[0].path).toEqual("username");
-  //     expect(response.body.errors[0].errorCode).toEqual(
-  //       "required.openapi.requestValidation",
-  //     );
-  //     expect(response.body.errors[0].message).toEqual(
-  //       "must have required property 'username'",
-  //     );
-  //     expect(response.body.errors[0].location).toEqual("body");
-  //   });
+    expect(response.statusCode).toEqual(400);
+    expect(response.body).toHaveProperty('message');
+    expect(response.body.message).toHaveLength(1);
+    expect(response.body.message[0]).toEqual('username must be a string');
+    expect(response.body).toHaveProperty('error');
+    expect(response.body.error).toEqual('Bad Request');
+    expect(response.body).toHaveProperty('statusCode');
+    expect(response.body.statusCode).toEqual(400);
+  });
 
   //   it("username too short", async () => {
   //     const tokenResponse = await getToken();
