@@ -10,6 +10,7 @@ export class CredentialsRequestDto {
 
   @ApiProperty()
   @IsString()
+  @MinLength(2)
   // @ts-expect-error TS2564
   password: string;
 }
