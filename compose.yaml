@@ -8,7 +8,10 @@ services:
     command: ["yarn", "run", "start:dev"]
     environment:
       NODE_ENV: development
+      NODE_TLS_REJECT_UNAUTHORIZED: 0
       OTEL_EXPORTER_OTLP_ENDPOINT: http://collector:4317
+      AZURE_LOG_LEVEL: verbose
+      DEBUG: "*,-require-in-the-middle"
     ports:
       - "3001:3001"
     volumes:
