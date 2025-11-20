@@ -25,6 +25,26 @@ const requestBody = {
 };
 const url = '/credentials';
 
+interface ValidationResponseBody {
+  message: string[];
+  error: string;
+  statusCode: number;
+}
+
+function assertIsValidationResponseBody(
+  obj: any,
+): asserts obj is ValidationResponseBody {
+  if (
+    typeof obj !== 'object' ||
+    obj === null ||
+    !('message' in obj) ||
+    !('error' in obj) ||
+    !('statusCode' in obj)
+  ) {
+    throw new Error('Is not a validation response body!');
+  }
+}
+
 describe('CredentialsController (e2e)', () => {
   let app: INestApplication<App>;
 
@@ -108,31 +128,43 @@ describe('CredentialsController (e2e)', () => {
     await test_invalid_issuer(app, url, requestBody);
   });
 
-  it('username missing', async () => {
+  it('It should not store credentials with username missing', async () => {
     const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
 
     const response = await request(app.getHttpServer())
       .post(url)
       .send({
         password: 'password',
       })
-      .set('Authorization', `Bearer ${tokenResponse.body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
-    expect(response.body).toHaveProperty('message');
-    expect(response.body.message).toHaveLength(2);
-    expect(response.body.message[0]).toEqual(
+
+    const validationResponseBody: unknown = response.body;
+    assertIsValidationResponseBody(validationResponseBody);
+
+    expect(response).toHaveProperty('body');
+    expect(validationResponseBody).toBeTypeOf('object');
+    expect(validationResponseBody).toHaveProperty('message');
+    expect(validationResponseBody.message).toHaveLength(2);
+    expect(validationResponseBody.message[0]).toEqual(
       'username must be longer than or equal to 2 characters',
     );
-    expect(response.body.message[1]).toEqual('username must be a string');
-    expect(response.body).toHaveProperty('error');
-    expect(response.body.error).toEqual('Bad Request');
-    expect(response.body).toHaveProperty('statusCode');
-    expect(response.body.statusCode).toEqual(400);
+    expect(validationResponseBody.message[1]).toEqual(
+      'username must be a string',
+    );
+    expect(validationResponseBody).toHaveProperty('error');
+    expect(validationResponseBody.error).toEqual('Bad Request');
+    expect(validationResponseBody).toHaveProperty('statusCode');
+    expect(validationResponseBody.statusCode).toEqual(400);
   });
 
-  it('username too short', async () => {
+  it('It should not store credentials with username too short', async () => {
     const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
 
     const response = await request(app.getHttpServer())
       .post(url)
@@ -140,21 +172,25 @@ describe('CredentialsController (e2e)', () => {
         username: 'a',
         password: 'password',
       })
-      .set('Authorization', `Bearer ${tokenResponse.body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
-    expect(response.body).toHaveProperty('message');
-    expect(response.body.message).toHaveLength(1);
-    expect(response.body.message[0]).toEqual(
+
+    const validationResponseBody: unknown = response.body;
+    assertIsValidationResponseBody(validationResponseBody);
+
+    expect(validationResponseBody).toHaveProperty('message');
+    expect(validationResponseBody.message).toHaveLength(1);
+    expect(validationResponseBody.message[0]).toEqual(
       'username must be longer than or equal to 2 characters',
     );
-    expect(response.body).toHaveProperty('error');
-    expect(response.body.error).toEqual('Bad Request');
-    expect(response.body).toHaveProperty('statusCode');
-    expect(response.body.statusCode).toEqual(400);
+    expect(validationResponseBody).toHaveProperty('error');
+    expect(validationResponseBody.error).toEqual('Bad Request');
+    expect(validationResponseBody).toHaveProperty('statusCode');
+    expect(validationResponseBody.statusCode).toEqual(400);
   });
 
-  it('username wrong type', async () => {
+  it('It should not store credentials with username wrong type', async () => {
     const tokenResponse = await getToken();
     const body: unknown = tokenResponse.body;
     assertIsTokenResponseBody(body);
@@ -168,19 +204,25 @@ describe('CredentialsController (e2e)', () => {
       .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
-    expect(response.body).toHaveProperty('message');
-    expect(response.body.message).toHaveLength(2);
-    expect(response.body.message[0]).toEqual(
+
+    const validationResponseBody: unknown = response.body;
+    assertIsValidationResponseBody(validationResponseBody);
+
+    expect(validationResponseBody).toHaveProperty('message');
+    expect(validationResponseBody.message).toHaveLength(2);
+    expect(validationResponseBody.message[0]).toEqual(
       'username must be longer than or equal to 2 characters',
     );
-    expect(response.body.message[1]).toEqual('username must be a string');
-    expect(response.body).toHaveProperty('error');
-    expect(response.body.error).toEqual('Bad Request');
-    expect(response.body).toHaveProperty('statusCode');
-    expect(response.body.statusCode).toEqual(400);
+    expect(validationResponseBody.message[1]).toEqual(
+      'username must be a string',
+    );
+    expect(validationResponseBody).toHaveProperty('error');
+    expect(validationResponseBody.error).toEqual('Bad Request');
+    expect(validationResponseBody).toHaveProperty('statusCode');
+    expect(validationResponseBody.statusCode).toEqual(400);
   });
 
-  it('password missing', async () => {
+  it('It should not store credentials with password missing', async () => {
     const tokenResponse = await getToken();
     const body: unknown = tokenResponse.body;
     assertIsTokenResponseBody(body);
@@ -193,19 +235,25 @@ describe('CredentialsController (e2e)', () => {
       .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
-    expect(response.body).toHaveProperty('message');
-    expect(response.body.message).toHaveLength(2);
-    expect(response.body.message[0]).toEqual(
+
+    const validationResponseBody: unknown = response.body;
+    assertIsValidationResponseBody(validationResponseBody);
+
+    expect(validationResponseBody).toHaveProperty('message');
+    expect(validationResponseBody.message).toHaveLength(2);
+    expect(validationResponseBody.message[0]).toEqual(
       'password must be longer than or equal to 2 characters',
     );
-    expect(response.body.message[1]).toEqual('password must be a string');
-    expect(response.body).toHaveProperty('error');
-    expect(response.body.error).toEqual('Bad Request');
-    expect(response.body).toHaveProperty('statusCode');
-    expect(response.body.statusCode).toEqual(400);
+    expect(validationResponseBody.message[1]).toEqual(
+      'password must be a string',
+    );
+    expect(validationResponseBody).toHaveProperty('error');
+    expect(validationResponseBody.error).toEqual('Bad Request');
+    expect(validationResponseBody).toHaveProperty('statusCode');
+    expect(validationResponseBody.statusCode).toEqual(400);
   });
 
-  it('password too short', async () => {
+  it('It should not store credentials with password too short', async () => {
     const tokenResponse = await getToken();
     const body: unknown = tokenResponse.body;
     assertIsTokenResponseBody(body);
@@ -219,18 +267,22 @@ describe('CredentialsController (e2e)', () => {
       .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
-    expect(response.body).toHaveProperty('message');
-    expect(response.body.message).toHaveLength(1);
-    expect(response.body.message[0]).toEqual(
+
+    const validationResponseBody: unknown = response.body;
+    assertIsValidationResponseBody(validationResponseBody);
+
+    expect(validationResponseBody).toHaveProperty('message');
+    expect(validationResponseBody.message).toHaveLength(1);
+    expect(validationResponseBody.message[0]).toEqual(
       'password must be longer than or equal to 2 characters',
     );
-    expect(response.body).toHaveProperty('error');
-    expect(response.body.error).toEqual('Bad Request');
-    expect(response.body).toHaveProperty('statusCode');
-    expect(response.body.statusCode).toEqual(400);
+    expect(validationResponseBody).toHaveProperty('error');
+    expect(validationResponseBody.error).toEqual('Bad Request');
+    expect(validationResponseBody).toHaveProperty('statusCode');
+    expect(validationResponseBody.statusCode).toEqual(400);
   });
 
-  it('password wrong type', async () => {
+  it('It should not store credentials with password wrong type', async () => {
     const tokenResponse = await getToken();
     const body: unknown = tokenResponse.body;
     assertIsTokenResponseBody(body);
@@ -241,18 +293,24 @@ describe('CredentialsController (e2e)', () => {
         username: 'username',
         password: false,
       })
-      .set('Authorization', `Bearer ${tokenResponse.body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
-    expect(response.body).toHaveProperty('message');
-    expect(response.body.message).toHaveLength(2);
-    expect(response.body.message[0]).toEqual(
+
+    const validationResponseBody: unknown = response.body;
+    assertIsValidationResponseBody(validationResponseBody);
+
+    expect(validationResponseBody).toHaveProperty('message');
+    expect(validationResponseBody.message).toHaveLength(2);
+    expect(validationResponseBody.message[0]).toEqual(
       'password must be longer than or equal to 2 characters',
     );
-    expect(response.body.message[1]).toEqual('password must be a string');
-    expect(response.body).toHaveProperty('error');
-    expect(response.body.error).toEqual('Bad Request');
-    expect(response.body).toHaveProperty('statusCode');
-    expect(response.body.statusCode).toEqual(400);
+    expect(validationResponseBody.message[1]).toEqual(
+      'password must be a string',
+    );
+    expect(validationResponseBody).toHaveProperty('error');
+    expect(validationResponseBody.error).toEqual('Bad Request');
+    expect(validationResponseBody).toHaveProperty('statusCode');
+    expect(validationResponseBody.statusCode).toEqual(400);
   });
 });
