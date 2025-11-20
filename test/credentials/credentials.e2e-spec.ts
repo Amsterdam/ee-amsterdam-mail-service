@@ -190,7 +190,7 @@ describe('CredentialsController (e2e)', () => {
       .send({
         username: 'username',
       })
-      .set('Authorization', `Bearer ${tokenResponse.body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
     expect(response.body).toHaveProperty('message');
@@ -205,29 +205,30 @@ describe('CredentialsController (e2e)', () => {
     expect(response.body.statusCode).toEqual(400);
   });
 
-  //   it("password too short", async () => {
-  //     const tokenResponse = await getToken();
+  it('password too short', async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
 
-  //     const response = await request(app)
-  //       .post(url)
-  //       .send({
-  //         username: "username",
-  //         password: "a",
-  //       })
-  //       .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send({
+        username: 'username',
+        password: 'a',
+      })
+      .set('Authorization', `Bearer ${body.access_token}`);
 
-  //     expect(response.statusCode).toEqual(422);
-  //     expect(response.body).toHaveProperty("errors");
-  //     expect(response.body.errors).toHaveLength(1);
-  //     expect(response.body.errors[0].path).toEqual("password");
-  //     expect(response.body.errors[0].errorCode).toEqual(
-  //       "minLength.openapi.requestValidation",
-  //     );
-  //     expect(response.body.errors[0].message).toEqual(
-  //       "must NOT have fewer than 2 characters",
-  //     );
-  //     expect(response.body.errors[0].location).toEqual("body");
-  //   });
+    expect(response.statusCode).toEqual(400);
+    expect(response.body).toHaveProperty('message');
+    expect(response.body.message).toHaveLength(1);
+    expect(response.body.message[0]).toEqual(
+      'password must be longer than or equal to 2 characters',
+    );
+    expect(response.body).toHaveProperty('error');
+    expect(response.body.error).toEqual('Bad Request');
+    expect(response.body).toHaveProperty('statusCode');
+    expect(response.body.statusCode).toEqual(400);
+  });
 
   //   it("password wrong type", async () => {
   //     const tokenResponse = await getToken();
