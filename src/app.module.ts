@@ -10,6 +10,13 @@ import { JWKSUriResolver, JWTHeaderVerifier } from './auth';
 import { AuthGuard } from './auth.guard';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { AuthExceptionFilter } from './auth-exception.filter';
+import { CredentialsController } from './credentials/credentials.controller';
+import { CredentialsUpserter } from './credentials/credentials';
+import CredentialsRepository from './repositories';
+import { SecretClient } from '@azure/keyvault-secrets';
+import { DefaultAzureCredential } from '@azure/identity';
+import type { TokenCredential } from '@azure/identity';
+import { CredentialsResponseDtoFactory } from './credentials/credentials.dto';
 
 @Module({
   imports: [
@@ -18,6 +25,9 @@ import { AuthExceptionFilter } from './auth-exception.filter';
       isGlobal: true,
       validationSchema: Joi.object({
         APP_BASE_URL: Joi.string().uri().default('http://localhost:3001'),
+        KEYVAULT_URL: Joi.string()
+          .uri()
+          .default('https://emulator.vault.azure.net:11001'),
         NODE_ENV: Joi.string()
           .valid('development', 'production')
           .default('development'),
@@ -58,9 +68,10 @@ import { AuthExceptionFilter } from './auth-exception.filter';
       rootPath: join(import.meta.dirname, '..', 'public'),
     }),
   ],
-  controllers: [PreviewController],
+  controllers: [CredentialsController, PreviewController],
   providers: [
     ConfigService,
+    CredentialsResponseDtoFactory,
     {
       provide: PreviewRenderer,
       inject: [ConfigService],
@@ -136,6 +147,44 @@ import { AuthExceptionFilter } from './auth-exception.filter';
     {
       provide: APP_FILTER,
       useClass: AuthExceptionFilter,
+    },
+    {
+      provide: SecretClient,
+      inject: [ConfigService],
+      useFactory: (configuration: ConfigService): SecretClient => {
+        const keyvaultUrl = configuration.get<string>('KEYVAULT_URL');
+        let credential: TokenCredential = new DefaultAzureCredential();
+
+        if (process.env.NODE_ENV != 'production') {
+          credential = {
+            // eslint-disable-next-line @typescript-eslint/require-await
+            getToken: async () => {
+              return {
+                token:
+                  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNzM1Njg5NjAwLCJleHAiOjQxMDI0NDQ4MDAsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0LyJ9.42D_zJ3qM02NM_ExWU9S9jvNGMfpop3YuWT9lFqJ5yU',
+                expiresOnTimestamp: 999999999999,
+              };
+            },
+          };
+        }
+
+        // @ts-expect-error TS2345
+        return new SecretClient(keyvaultUrl, credential);
+      },
+    },
+    {
+      provide: CredentialsRepository,
+      inject: [SecretClient],
+      useFactory: (client: SecretClient): CredentialsRepository => {
+        return new CredentialsRepository(client);
+      },
+    },
+    {
+      provide: CredentialsUpserter,
+      inject: [CredentialsRepository],
+      useFactory: (repository: CredentialsRepository): CredentialsUpserter => {
+        return new CredentialsUpserter(repository);
+      },
     },
   ],
 })
