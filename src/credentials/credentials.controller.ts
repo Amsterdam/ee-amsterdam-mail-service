@@ -5,9 +5,16 @@ import {
   CredentialsResponseDto,
   CredentialsResponseDtoFactory,
 } from './credentials.dto';
-import { ApiBody, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiOAuth2,
+  ApiResponse,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import type { Request } from 'express';
 
+@ApiOAuth2(['credentials'])
 @Controller('credentials')
 export class CredentialsController {
   public constructor(
@@ -19,6 +26,20 @@ export class CredentialsController {
   @HttpCode(200)
   @ApiBody({ type: CredentialsRequestDto })
   @ApiResponse({ type: CredentialsResponseDto })
+  @ApiBadRequestResponse({
+    headers: {
+      'www-authenticate': {
+        description: 'May contain information on authentication failures',
+      },
+    },
+  })
+  @ApiUnauthorizedResponse({
+    headers: {
+      'www-authenticate': {
+        description: 'Contains information on authentication failures',
+      },
+    },
+  })
   public async credentials(
     @Req() request: Request,
     @Body() credentialsRequestDto: CredentialsRequestDto,
