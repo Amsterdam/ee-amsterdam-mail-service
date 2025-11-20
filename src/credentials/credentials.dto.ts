@@ -1,9 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsString, MinLength } from 'class-validator';
 
 export class CredentialsRequestDto {
   @ApiProperty()
   @IsString()
+  @MinLength(2)
   // @ts-expect-error TS2564
   username: string;
 
