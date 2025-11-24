@@ -17,6 +17,14 @@ import { SecretClient } from '@azure/keyvault-secrets';
 import { DefaultAzureCredential } from '@azure/identity';
 import type { TokenCredential } from '@azure/identity';
 import { CredentialsResponseDtoFactory } from './credentials/credentials.dto';
+import { SendController } from './send/send.controller';
+import {
+  MailerFactory,
+  Renderer,
+  SenderFactory,
+  TransporterFactory,
+} from './send/send';
+import { SendResponseDtoFactory } from './send/send.dto';
 
 @Module({
   imports: [
@@ -62,16 +70,20 @@ import { CredentialsResponseDtoFactory } from './credentials/credentials.dto';
           .default(
             'http://localhost:8002/realms/amsterdam-mail-service/.well-known/openid-configuration',
           ),
+        SMTP_HOST: Joi.string().default('mailpit'),
+        SMTP_PORT: Joi.number().port().default(1025),
       }),
     }),
     ServeStaticModule.forRoot({
       rootPath: join(import.meta.dirname, '..', 'public'),
     }),
   ],
-  controllers: [CredentialsController, PreviewController],
+  controllers: [CredentialsController, PreviewController, SendController],
   providers: [
     ConfigService,
     CredentialsResponseDtoFactory,
+    Renderer,
+    SendResponseDtoFactory,
     {
       provide: PreviewRenderer,
       inject: [ConfigService],
@@ -184,6 +196,34 @@ import { CredentialsResponseDtoFactory } from './credentials/credentials.dto';
       inject: [CredentialsRepository],
       useFactory: (repository: CredentialsRepository): CredentialsUpserter => {
         return new CredentialsUpserter(repository);
+      },
+    },
+    {
+      provide: TransporterFactory,
+      inject: [ConfigService],
+      useFactory: (configuration: ConfigService): TransporterFactory => {
+        return new TransporterFactory(
+          // @ts-expect-error TS2345
+          configuration.get<string>('SMTP_HOST'),
+          configuration.get<number>('SMTP_PORT'),
+        );
+      },
+    },
+    {
+      provide: MailerFactory,
+      inject: [CredentialsRepository, TransporterFactory],
+      useFactory: (
+        repository: CredentialsRepository,
+        factory: TransporterFactory,
+      ): MailerFactory => {
+        return new MailerFactory(repository, factory);
+      },
+    },
+    {
+      provide: SenderFactory,
+      inject: [Renderer, MailerFactory],
+      useFactory: (renderer: Renderer, factory: MailerFactory) => {
+        return new SenderFactory(renderer, factory);
       },
     },
   ],

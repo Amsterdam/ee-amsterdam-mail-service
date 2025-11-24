@@ -19,61 +19,17 @@ import {
 } from 'test/auth';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { SecretClient } from '@azure/keyvault-secrets';
+import {
+  assertIsValidationResponseBody,
+  assertIsValidResponseBody,
+  deleteCredentials,
+} from 'test/utils';
 
 const requestBody = {
   username: 'test_smtp_user',
   password: 'smtp_secret',
 };
 const url = '/credentials';
-
-interface ValidationResponseBody {
-  message: string[];
-  error: string;
-  statusCode: number;
-}
-
-function assertIsValidationResponseBody(
-  obj: any,
-): asserts obj is ValidationResponseBody {
-  if (
-    typeof obj !== 'object' ||
-    obj === null ||
-    !('message' in obj) ||
-    !('error' in obj) ||
-    !('statusCode' in obj)
-  ) {
-    throw new Error('Is not a validation response body!');
-  }
-}
-
-interface ValidResponseBody {
-  message: string;
-}
-
-function assertIsValidResponseBody(obj: any): asserts obj is ValidResponseBody {
-  if (typeof obj !== 'object' || obj === null || !('message' in obj)) {
-    throw new Error('Is not a valid resonse body!');
-  }
-}
-
-const deleteCredentials = async (client: SecretClient) => {
-  try {
-    const poller = await client.beginDeleteSecret(
-      'ccd03ed4-6873-422f-828b-38a39e358fc9-smtpUser',
-    );
-    await poller.pollUntilDone();
-  } catch (err) {
-    console.error(err);
-  }
-  try {
-    const poller = await client.beginDeleteSecret(
-      'ccd03ed4-6873-422f-828b-38a39e358fc9-smtpPass',
-    );
-    await poller.pollUntilDone();
-  } catch (err) {
-    console.error(err);
-  }
-};
 
 describe('CredentialsController (e2e)', () => {
   let app: INestApplication<App>;
