@@ -21,7 +21,7 @@ import {
   test_invalid_typ_header,
   test_no_token_provided,
 } from 'test/auth';
-import { deleteCredentials } from 'test/utils';
+import { assertIsValidationResponseBody, deleteCredentials } from 'test/utils';
 import { SecretClient } from '@azure/keyvault-secrets';
 
 const mailpitClient = new MailpitClient('http://mailpit:8025');
@@ -166,34 +166,32 @@ describe('SendController (e2e)', () => {
     );
   });
 
-  // it("title missing", async () => {
-  //   const tokenResponse = await getToken();
-  //   const body: unknown = tokenResponse.body;
-  //   assertIsTokenResponseBody(body);
+  it("title missing", async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
 
-  //   const response = await request(app.getHttpServer())
-  //     .post(url)
-  //     .send({
-  //       previewText: "preview text",
-  //       bodyText: "body text",
-  //       from: "me@example.com",
-  //       to: "you@example.com",
-  //       subject: "subject",
-  //     })
-  //     .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send({
+        previewText: "preview text",
+        bodyText: "body text",
+        from: "me@example.com",
+        to: "you@example.com",
+        subject: "subject",
+      })
+      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
 
-  //   expect(response.statusCode).toEqual(422);
-  //   expect(response.body).toHaveProperty("errors");
-  //   expect(response.body.errors).toHaveLength(1);
-  //   expect(response.body.errors[0].path).toEqual("title");
-  //   expect(response.body.errors[0].errorCode).toEqual(
-  //     "required.openapi.requestValidation",
-  //   );
-  //   expect(response.body.errors[0].message).toEqual(
-  //     "must have required property 'title'",
-  //   );
-  //   expect(response.body.errors[0].location).toEqual("body");
-  // });
+    expect(response.statusCode).toEqual(400);
+
+    const validationResponseBody: unknown = response.body;
+    assertIsValidationResponseBody(validationResponseBody);
+
+    expect(validationResponseBody.message).toHaveLength(1);
+    expect(validationResponseBody.message[0]).toEqual('title must be a string');
+    expect(validationResponseBody.error).toEqual("Bad Request");
+    expect(validationResponseBody.statusCode).toEqual(400);
+  });
 
   // it("title too short", async () => {
   //   const tokenResponse = await getToken();
