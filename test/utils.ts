@@ -18,3 +18,23 @@ export const deleteCredentials = async (client: SecretClient) => {
     console.error(err);
   }
 };
+
+export interface ValidationResponseBody {
+  message: string[];
+  error: string;
+  statusCode: number;
+}
+
+export function assertIsValidationResponseBody(
+  obj: any,
+): asserts obj is ValidationResponseBody {
+  if (
+    typeof obj !== 'object' ||
+    obj === null ||
+    !('message' in obj) ||
+    !('error' in obj) ||
+    !('statusCode' in obj)
+  ) {
+    throw new Error('Is not a validation response body!');
+  }
+}
