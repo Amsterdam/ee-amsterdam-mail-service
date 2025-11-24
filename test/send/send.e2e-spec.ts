@@ -221,30 +221,33 @@ describe('SendController (e2e)', () => {
     expect(validationResponseBody.statusCode).toEqual(400);
   });
 
-  // it("title wrong type", async () => {
-  //   const tokenResponse = await getToken();
-  //   const body: unknown = tokenResponse.body;
-  //   assertIsTokenResponseBody(body);
+  it("title wrong type", async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
 
-  //   const response = await request(app.getHttpServer())
-  //     .post(url)
-  //     .send({
-  //       title: false,
-  //       previewText: "preview text",
-  //       bodyText: "body text",
-  //       from: "me@example.com",
-  //       to: "you@example.com",
-  //       subject: "subject",
-  //     })
-  //     .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send({
+        title: false,
+        previewText: "preview text",
+        bodyText: "body text",
+        from: "me@example.com",
+        to: "you@example.com",
+        subject: "subject",
+      })
+      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
 
-  //   expect(response.statusCode).toEqual(422);
-  //   expect(response.body).toHaveProperty("errors");
-  //   expect(response.body.errors).toHaveLength(1);
-  //   expect(response.body.errors[0].path).toEqual("title");
-  //   expect(response.body.errors[0].message).toEqual("must be string");
-  //   expect(response.body.errors[0].location).toEqual("body");
-  // });
+    expect(response.statusCode).toEqual(400);
+
+    const validationResponseBody: unknown = response.body;
+    assertIsValidationResponseBody(validationResponseBody);
+
+    expect(validationResponseBody.message).toHaveLength(2);
+    expect(validationResponseBody.message[1]).toEqual('title must be a string');
+    expect(validationResponseBody.error).toEqual("Bad Request");
+    expect(validationResponseBody.statusCode).toEqual(400);
+  });
 
   // it("previewText missing", async () => {
   //   const tokenResponse = await getToken();
