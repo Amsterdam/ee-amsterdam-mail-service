@@ -44,7 +44,7 @@ export class SendController {
   public async send(
     @Req() request: Request,
     @Body() sendRequestDto: SendRequestDto,
-    @Res() response: Response,
+    @Res({ passthrough: true }) response: Response,
   ): Promise<SendResponseDto> {
     const sub = request.jwt.claims.sub;
     try {
