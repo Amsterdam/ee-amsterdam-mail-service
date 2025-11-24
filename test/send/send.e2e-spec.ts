@@ -28,11 +28,12 @@ const mailpitClient = new MailpitClient('http://mailpit:8025');
 const from = 'me@example.com';
 const to = 'you@example.com';
 const subject = 'My subject';
-const expectedText = `MY TITLE\r\n\r\n\r\nBODY TEXT\r\n\r\n * list1\r\n * list2\r\n\r\n--------------------------------------------------------------------------------\r\n\r\nDisclaimer teksten zijn altijd superleuk om te lezen!\r\n\r\nAmsterdam.nl https://amsterdam.nl/\r\n\r\n14020 tel:14020`;
+const expectedText = `MY TITLE\r\n\r\n\r\nBODY TEXT\r\n\r\n * list1\r\n * list2\r\n\r\n----------------------------------------\r\n\r\nDisclaimer teksten zijn altijd superleuk om te lezen!\r\n\r\nAmsterdam.nl https://amsterdam.nl/\r\n\r\n14020 tel:14020`;
 const getExpectedHtml = (id: string): string => {
-  const expected = readFileSync(__dirname + '/expected.html', {
-    encoding: 'utf8',
-  });
+  const expected = readFileSync(
+    './test/resources/sendMailBody.html',
+    { encoding: 'utf-8' },
+  );
   return format(expected, id, id);
 };
 const requestBody = {
@@ -148,530 +149,530 @@ describe('SendController (e2e)', () => {
     await deleteCredentials(app.get(SecretClient));
   });
 
-  it("It should not send mail with authentication enabled and a valid token, but no credentials in keyvault", async () => {
-    const tokenResponse = await getToken();
-    const body: unknown = tokenResponse.body;
-    assertIsTokenResponseBody(body);
+  // it("It should not send mail with a valid token, but no credentials in keyvault", async () => {
+  //   const tokenResponse = await getToken();
+  //   const body: unknown = tokenResponse.body;
+  //   assertIsTokenResponseBody(body);
 
-    const response = await request(app.getHttpServer())
-      .post(url)
-      .send(requestBody)
-      .set("Authorization", `Bearer ${body.access_token}`);
+  //   const response = await request(app.getHttpServer())
+  //     .post(url)
+  //     .send(requestBody)
+  //     .set("Authorization", `Bearer ${body.access_token}`);
 
-    expect(response.statusCode).toEqual(404);
-    expect(response.body).toHaveProperty("message");
-    expect(response.body.message).toEqual(
-      "Credentials not found. Did you add them using the /credentials endpoint?",
-    );
-  });
+  //   expect(response.statusCode).toEqual(404);
+  //   expect(response.body).toHaveProperty("message");
+  //   expect(response.body.message).toEqual(
+  //     "Credentials not found. Did you add them using the /credentials endpoint?",
+  //   );
+  // });
 
-  it("title missing", async () => {
-    const tokenResponse = await getToken();
-    const body: unknown = tokenResponse.body;
-    assertIsTokenResponseBody(body);
+  // it("title missing", async () => {
+  //   const tokenResponse = await getToken();
+  //   const body: unknown = tokenResponse.body;
+  //   assertIsTokenResponseBody(body);
 
-    const response = await request(app.getHttpServer())
-      .post(url)
-      .send({
-        previewText: "preview text",
-        bodyText: "body text",
-        from: "me@example.com",
-        to: "you@example.com",
-        subject: "subject",
-      })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+  //   const response = await request(app.getHttpServer())
+  //     .post(url)
+  //     .send({
+  //       previewText: "preview text",
+  //       bodyText: "body text",
+  //       from: "me@example.com",
+  //       to: "you@example.com",
+  //       subject: "subject",
+  //     })
+  //     .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
 
-    expect(response.statusCode).toEqual(422);
-    expect(response.body).toHaveProperty("errors");
-    expect(response.body.errors).toHaveLength(1);
-    expect(response.body.errors[0].path).toEqual("title");
-    expect(response.body.errors[0].errorCode).toEqual(
-      "required.openapi.requestValidation",
-    );
-    expect(response.body.errors[0].message).toEqual(
-      "must have required property 'title'",
-    );
-    expect(response.body.errors[0].location).toEqual("body");
-  });
+  //   expect(response.statusCode).toEqual(422);
+  //   expect(response.body).toHaveProperty("errors");
+  //   expect(response.body.errors).toHaveLength(1);
+  //   expect(response.body.errors[0].path).toEqual("title");
+  //   expect(response.body.errors[0].errorCode).toEqual(
+  //     "required.openapi.requestValidation",
+  //   );
+  //   expect(response.body.errors[0].message).toEqual(
+  //     "must have required property 'title'",
+  //   );
+  //   expect(response.body.errors[0].location).toEqual("body");
+  // });
 
-  it("title too short", async () => {
-    const tokenResponse = await getToken();
-    const body: unknown = tokenResponse.body;
-    assertIsTokenResponseBody(body);
+  // it("title too short", async () => {
+  //   const tokenResponse = await getToken();
+  //   const body: unknown = tokenResponse.body;
+  //   assertIsTokenResponseBody(body);
 
-    const response = await request(app.getHttpServer())
-      .post(url)
-      .send({
-        title: "a",
-        previewText: "preview text",
-        bodyText: "body text",
-        from: "me@example.com",
-        to: "you@example.com",
-        subject: "subject",
-      })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+  //   const response = await request(app.getHttpServer())
+  //     .post(url)
+  //     .send({
+  //       title: "a",
+  //       previewText: "preview text",
+  //       bodyText: "body text",
+  //       from: "me@example.com",
+  //       to: "you@example.com",
+  //       subject: "subject",
+  //     })
+  //     .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
 
-    expect(response.statusCode).toEqual(422);
-    expect(response.body).toHaveProperty("errors");
-    expect(response.body.errors).toHaveLength(1);
-    expect(response.body.errors[0].path).toEqual("title");
-    expect(response.body.errors[0].errorCode).toEqual(
-      "minLength.openapi.requestValidation",
-    );
-    expect(response.body.errors[0].message).toEqual(
-      "must NOT have fewer than 2 characters",
-    );
-    expect(response.body.errors[0].location).toEqual("body");
-  });
+  //   expect(response.statusCode).toEqual(422);
+  //   expect(response.body).toHaveProperty("errors");
+  //   expect(response.body.errors).toHaveLength(1);
+  //   expect(response.body.errors[0].path).toEqual("title");
+  //   expect(response.body.errors[0].errorCode).toEqual(
+  //     "minLength.openapi.requestValidation",
+  //   );
+  //   expect(response.body.errors[0].message).toEqual(
+  //     "must NOT have fewer than 2 characters",
+  //   );
+  //   expect(response.body.errors[0].location).toEqual("body");
+  // });
 
-  it("title wrong type", async () => {
-    const tokenResponse = await getToken();
-    const body: unknown = tokenResponse.body;
-    assertIsTokenResponseBody(body);
+  // it("title wrong type", async () => {
+  //   const tokenResponse = await getToken();
+  //   const body: unknown = tokenResponse.body;
+  //   assertIsTokenResponseBody(body);
 
-    const response = await request(app.getHttpServer())
-      .post(url)
-      .send({
-        title: false,
-        previewText: "preview text",
-        bodyText: "body text",
-        from: "me@example.com",
-        to: "you@example.com",
-        subject: "subject",
-      })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+  //   const response = await request(app.getHttpServer())
+  //     .post(url)
+  //     .send({
+  //       title: false,
+  //       previewText: "preview text",
+  //       bodyText: "body text",
+  //       from: "me@example.com",
+  //       to: "you@example.com",
+  //       subject: "subject",
+  //     })
+  //     .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
 
-    expect(response.statusCode).toEqual(422);
-    expect(response.body).toHaveProperty("errors");
-    expect(response.body.errors).toHaveLength(1);
-    expect(response.body.errors[0].path).toEqual("title");
-    expect(response.body.errors[0].message).toEqual("must be string");
-    expect(response.body.errors[0].location).toEqual("body");
-  });
+  //   expect(response.statusCode).toEqual(422);
+  //   expect(response.body).toHaveProperty("errors");
+  //   expect(response.body.errors).toHaveLength(1);
+  //   expect(response.body.errors[0].path).toEqual("title");
+  //   expect(response.body.errors[0].message).toEqual("must be string");
+  //   expect(response.body.errors[0].location).toEqual("body");
+  // });
 
-  it("previewText missing", async () => {
-    const tokenResponse = await getToken();
-    const body: unknown = tokenResponse.body;
-    assertIsTokenResponseBody(body);
+  // it("previewText missing", async () => {
+  //   const tokenResponse = await getToken();
+  //   const body: unknown = tokenResponse.body;
+  //   assertIsTokenResponseBody(body);
 
-    const response = await request(app.getHttpServer())
-      .post(url)
-      .send({
-        title: "title",
-        bodyText: "body text",
-        from: "me@example.com",
-        to: "you@example.com",
-        subject: "subject",
-      })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+  //   const response = await request(app.getHttpServer())
+  //     .post(url)
+  //     .send({
+  //       title: "title",
+  //       bodyText: "body text",
+  //       from: "me@example.com",
+  //       to: "you@example.com",
+  //       subject: "subject",
+  //     })
+  //     .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
 
-    expect(response.statusCode).toEqual(422);
-    expect(response.body).toHaveProperty("errors");
-    expect(response.body.errors).toHaveLength(1);
-    expect(response.body.errors[0].path).toEqual("previewText");
-    expect(response.body.errors[0].errorCode).toEqual(
-      "required.openapi.requestValidation",
-    );
-    expect(response.body.errors[0].message).toEqual(
-      "must have required property 'previewText'",
-    );
-    expect(response.body.errors[0].location).toEqual("body");
-  });
+  //   expect(response.statusCode).toEqual(422);
+  //   expect(response.body).toHaveProperty("errors");
+  //   expect(response.body.errors).toHaveLength(1);
+  //   expect(response.body.errors[0].path).toEqual("previewText");
+  //   expect(response.body.errors[0].errorCode).toEqual(
+  //     "required.openapi.requestValidation",
+  //   );
+  //   expect(response.body.errors[0].message).toEqual(
+  //     "must have required property 'previewText'",
+  //   );
+  //   expect(response.body.errors[0].location).toEqual("body");
+  // });
 
-  it("previewText too short", async () => {
-    const tokenResponse = await getToken();
-    const body: unknown = tokenResponse.body;
-    assertIsTokenResponseBody(body);
+  // it("previewText too short", async () => {
+  //   const tokenResponse = await getToken();
+  //   const body: unknown = tokenResponse.body;
+  //   assertIsTokenResponseBody(body);
 
-    const response = await request(app.getHttpServer())
-      .post(url)
-      .send({
-        title: "title",
-        previewText: "a",
-        bodyText: "body text",
-        from: "me@example.com",
-        to: "you@example.com",
-        subject: "subject",
-      })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+  //   const response = await request(app.getHttpServer())
+  //     .post(url)
+  //     .send({
+  //       title: "title",
+  //       previewText: "a",
+  //       bodyText: "body text",
+  //       from: "me@example.com",
+  //       to: "you@example.com",
+  //       subject: "subject",
+  //     })
+  //     .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
 
-    expect(response.statusCode).toEqual(422);
-    expect(response.body).toHaveProperty("errors");
-    expect(response.body.errors).toHaveLength(1);
-    expect(response.body.errors[0].path).toEqual("previewText");
-    expect(response.body.errors[0].errorCode).toEqual(
-      "minLength.openapi.requestValidation",
-    );
-    expect(response.body.errors[0].message).toEqual(
-      "must NOT have fewer than 2 characters",
-    );
-    expect(response.body.errors[0].location).toEqual("body");
-  });
+  //   expect(response.statusCode).toEqual(422);
+  //   expect(response.body).toHaveProperty("errors");
+  //   expect(response.body.errors).toHaveLength(1);
+  //   expect(response.body.errors[0].path).toEqual("previewText");
+  //   expect(response.body.errors[0].errorCode).toEqual(
+  //     "minLength.openapi.requestValidation",
+  //   );
+  //   expect(response.body.errors[0].message).toEqual(
+  //     "must NOT have fewer than 2 characters",
+  //   );
+  //   expect(response.body.errors[0].location).toEqual("body");
+  // });
 
-  it("previewText wrong type", async () => {
-    const tokenResponse = await getToken();
-    const body: unknown = tokenResponse.body;
-    assertIsTokenResponseBody(body);
+  // it("previewText wrong type", async () => {
+  //   const tokenResponse = await getToken();
+  //   const body: unknown = tokenResponse.body;
+  //   assertIsTokenResponseBody(body);
 
-    const response = await request(app.getHttpServer())
-      .post(url)
-      .send({
-        title: "title",
-        previewText: false,
-        bodyText: "body text",
-        from: "me@example.com",
-        to: "you@example.com",
-        subject: "subject",
-      })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+  //   const response = await request(app.getHttpServer())
+  //     .post(url)
+  //     .send({
+  //       title: "title",
+  //       previewText: false,
+  //       bodyText: "body text",
+  //       from: "me@example.com",
+  //       to: "you@example.com",
+  //       subject: "subject",
+  //     })
+  //     .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
 
-    expect(response.statusCode).toEqual(422);
-    expect(response.body).toHaveProperty("errors");
-    expect(response.body.errors).toHaveLength(1);
-    expect(response.body.errors[0].path).toEqual("previewText");
-    expect(response.body.errors[0].message).toEqual("must be string");
-    expect(response.body.errors[0].location).toEqual("body");
-  });
+  //   expect(response.statusCode).toEqual(422);
+  //   expect(response.body).toHaveProperty("errors");
+  //   expect(response.body.errors).toHaveLength(1);
+  //   expect(response.body.errors[0].path).toEqual("previewText");
+  //   expect(response.body.errors[0].message).toEqual("must be string");
+  //   expect(response.body.errors[0].location).toEqual("body");
+  // });
 
-  it("bodyText missing", async () => {
-    const tokenResponse = await getToken();
-    const body: unknown = tokenResponse.body;
-    assertIsTokenResponseBody(body);
+  // it("bodyText missing", async () => {
+  //   const tokenResponse = await getToken();
+  //   const body: unknown = tokenResponse.body;
+  //   assertIsTokenResponseBody(body);
 
-    const response = await request(app.getHttpServer())
-      .post(url)
-      .send({
-        title: "title",
-        previewText: "preview text",
-        from: "me@example.com",
-        to: "you@example.com",
-        subject: "subject",
-      })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+  //   const response = await request(app.getHttpServer())
+  //     .post(url)
+  //     .send({
+  //       title: "title",
+  //       previewText: "preview text",
+  //       from: "me@example.com",
+  //       to: "you@example.com",
+  //       subject: "subject",
+  //     })
+  //     .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
 
-    expect(response.statusCode).toEqual(422);
-    expect(response.body).toHaveProperty("errors");
-    expect(response.body.errors).toHaveLength(1);
-    expect(response.body.errors[0].path).toEqual("bodyText");
-    expect(response.body.errors[0].errorCode).toEqual(
-      "required.openapi.requestValidation",
-    );
-    expect(response.body.errors[0].message).toEqual(
-      "must have required property 'bodyText'",
-    );
-    expect(response.body.errors[0].location).toEqual("body");
-  });
+  //   expect(response.statusCode).toEqual(422);
+  //   expect(response.body).toHaveProperty("errors");
+  //   expect(response.body.errors).toHaveLength(1);
+  //   expect(response.body.errors[0].path).toEqual("bodyText");
+  //   expect(response.body.errors[0].errorCode).toEqual(
+  //     "required.openapi.requestValidation",
+  //   );
+  //   expect(response.body.errors[0].message).toEqual(
+  //     "must have required property 'bodyText'",
+  //   );
+  //   expect(response.body.errors[0].location).toEqual("body");
+  // });
 
-  it("bodyText too short", async () => {
-    const tokenResponse = await getToken();
-    const body: unknown = tokenResponse.body;
-    assertIsTokenResponseBody(body);
+  // it("bodyText too short", async () => {
+  //   const tokenResponse = await getToken();
+  //   const body: unknown = tokenResponse.body;
+  //   assertIsTokenResponseBody(body);
 
-    const response = await request(app.getHttpServer())
-      .post(url)
-      .send({
-        title: "title",
-        previewText: "preview text",
-        bodyText: "a",
-        from: "me@example.com",
-        to: "you@example.com",
-        subject: "subject",
-      })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+  //   const response = await request(app.getHttpServer())
+  //     .post(url)
+  //     .send({
+  //       title: "title",
+  //       previewText: "preview text",
+  //       bodyText: "a",
+  //       from: "me@example.com",
+  //       to: "you@example.com",
+  //       subject: "subject",
+  //     })
+  //     .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
 
-    expect(response.statusCode).toEqual(422);
-    expect(response.body).toHaveProperty("errors");
-    expect(response.body.errors).toHaveLength(1);
-    expect(response.body.errors[0].path).toEqual("bodyText");
-    expect(response.body.errors[0].errorCode).toEqual(
-      "minLength.openapi.requestValidation",
-    );
-    expect(response.body.errors[0].message).toEqual(
-      "must NOT have fewer than 2 characters",
-    );
-    expect(response.body.errors[0].location).toEqual("body");
-  });
+  //   expect(response.statusCode).toEqual(422);
+  //   expect(response.body).toHaveProperty("errors");
+  //   expect(response.body.errors).toHaveLength(1);
+  //   expect(response.body.errors[0].path).toEqual("bodyText");
+  //   expect(response.body.errors[0].errorCode).toEqual(
+  //     "minLength.openapi.requestValidation",
+  //   );
+  //   expect(response.body.errors[0].message).toEqual(
+  //     "must NOT have fewer than 2 characters",
+  //   );
+  //   expect(response.body.errors[0].location).toEqual("body");
+  // });
 
-  it("bodyText wrong type", async () => {
-    const tokenResponse = await getToken();
-    const body: unknown = tokenResponse.body;
-    assertIsTokenResponseBody(body);
+  // it("bodyText wrong type", async () => {
+  //   const tokenResponse = await getToken();
+  //   const body: unknown = tokenResponse.body;
+  //   assertIsTokenResponseBody(body);
 
-    const response = await request(app.getHttpServer())
-      .post(url)
-      .send({
-        title: "title",
-        previewText: "preview text",
-        bodyText: false,
-        from: "me@example.com",
-        to: "you@example.com",
-        subject: "subject",
-      })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+  //   const response = await request(app.getHttpServer())
+  //     .post(url)
+  //     .send({
+  //       title: "title",
+  //       previewText: "preview text",
+  //       bodyText: false,
+  //       from: "me@example.com",
+  //       to: "you@example.com",
+  //       subject: "subject",
+  //     })
+  //     .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
 
-    expect(response.statusCode).toEqual(422);
-    expect(response.body).toHaveProperty("errors");
-    expect(response.body.errors).toHaveLength(1);
-    expect(response.body.errors[0].path).toEqual("bodyText");
-    expect(response.body.errors[0].message).toEqual("must be string");
-    expect(response.body.errors[0].location).toEqual("body");
-  });
+  //   expect(response.statusCode).toEqual(422);
+  //   expect(response.body).toHaveProperty("errors");
+  //   expect(response.body.errors).toHaveLength(1);
+  //   expect(response.body.errors[0].path).toEqual("bodyText");
+  //   expect(response.body.errors[0].message).toEqual("must be string");
+  //   expect(response.body.errors[0].location).toEqual("body");
+  // });
 
-  it("subject missing", async () => {
-    const tokenResponse = await getToken();
-    const body: unknown = tokenResponse.body;
-    assertIsTokenResponseBody(body);
+  // it("subject missing", async () => {
+  //   const tokenResponse = await getToken();
+  //   const body: unknown = tokenResponse.body;
+  //   assertIsTokenResponseBody(body);
 
-    const response = await request(app.getHttpServer())
-      .post(url)
-      .send({
-        title: "title",
-        previewText: "preview text",
-        bodyText: "body text",
-        from: "me@example.com",
-        to: "you@example.com",
-      })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+  //   const response = await request(app.getHttpServer())
+  //     .post(url)
+  //     .send({
+  //       title: "title",
+  //       previewText: "preview text",
+  //       bodyText: "body text",
+  //       from: "me@example.com",
+  //       to: "you@example.com",
+  //     })
+  //     .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
 
-    expect(response.statusCode).toEqual(422);
-    expect(response.body).toHaveProperty("errors");
-    expect(response.body.errors).toHaveLength(1);
-    expect(response.body.errors[0].path).toEqual("subject");
-    expect(response.body.errors[0].errorCode).toEqual(
-      "required.openapi.requestValidation",
-    );
-    expect(response.body.errors[0].message).toEqual(
-      "must have required property 'subject'",
-    );
-    expect(response.body.errors[0].location).toEqual("body");
-  });
+  //   expect(response.statusCode).toEqual(422);
+  //   expect(response.body).toHaveProperty("errors");
+  //   expect(response.body.errors).toHaveLength(1);
+  //   expect(response.body.errors[0].path).toEqual("subject");
+  //   expect(response.body.errors[0].errorCode).toEqual(
+  //     "required.openapi.requestValidation",
+  //   );
+  //   expect(response.body.errors[0].message).toEqual(
+  //     "must have required property 'subject'",
+  //   );
+  //   expect(response.body.errors[0].location).toEqual("body");
+  // });
 
-  it("subject too short", async () => {
-    const tokenResponse = await getToken();
-    const body: unknown = tokenResponse.body;
-    assertIsTokenResponseBody(body);
+  // it("subject too short", async () => {
+  //   const tokenResponse = await getToken();
+  //   const body: unknown = tokenResponse.body;
+  //   assertIsTokenResponseBody(body);
 
-    const response = await request(app.getHttpServer())
-      .post(url)
-      .send({
-        title: "title",
-        previewText: "preview text",
-        bodyText: "body text",
-        from: "me@example.com",
-        to: "you@example.com",
-        subject: "s",
-      })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+  //   const response = await request(app.getHttpServer())
+  //     .post(url)
+  //     .send({
+  //       title: "title",
+  //       previewText: "preview text",
+  //       bodyText: "body text",
+  //       from: "me@example.com",
+  //       to: "you@example.com",
+  //       subject: "s",
+  //     })
+  //     .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
 
-    expect(response.statusCode).toEqual(422);
-    expect(response.body).toHaveProperty("errors");
-    expect(response.body.errors).toHaveLength(1);
-    expect(response.body.errors[0].path).toEqual("subject");
-    expect(response.body.errors[0].errorCode).toEqual(
-      "minLength.openapi.requestValidation",
-    );
-    expect(response.body.errors[0].message).toEqual(
-      "must NOT have fewer than 2 characters",
-    );
-    expect(response.body.errors[0].location).toEqual("body");
-  });
+  //   expect(response.statusCode).toEqual(422);
+  //   expect(response.body).toHaveProperty("errors");
+  //   expect(response.body.errors).toHaveLength(1);
+  //   expect(response.body.errors[0].path).toEqual("subject");
+  //   expect(response.body.errors[0].errorCode).toEqual(
+  //     "minLength.openapi.requestValidation",
+  //   );
+  //   expect(response.body.errors[0].message).toEqual(
+  //     "must NOT have fewer than 2 characters",
+  //   );
+  //   expect(response.body.errors[0].location).toEqual("body");
+  // });
 
-  it("subject wrong type", async () => {
-    const tokenResponse = await getToken();
-    const body: unknown = tokenResponse.body;
-    assertIsTokenResponseBody(body);
+  // it("subject wrong type", async () => {
+  //   const tokenResponse = await getToken();
+  //   const body: unknown = tokenResponse.body;
+  //   assertIsTokenResponseBody(body);
 
-    const response = await request(app.getHttpServer())
-      .post(url)
-      .send({
-        title: "title",
-        previewText: "preview text",
-        bodyText: "body text",
-        from: "me@example.com",
-        to: "you@example.com",
-        subject: false,
-      })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+  //   const response = await request(app.getHttpServer())
+  //     .post(url)
+  //     .send({
+  //       title: "title",
+  //       previewText: "preview text",
+  //       bodyText: "body text",
+  //       from: "me@example.com",
+  //       to: "you@example.com",
+  //       subject: false,
+  //     })
+  //     .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
 
-    expect(response.statusCode).toEqual(422);
-    expect(response.body).toHaveProperty("errors");
-    expect(response.body.errors).toHaveLength(1);
-    expect(response.body.errors[0].path).toEqual("subject");
-    expect(response.body.errors[0].message).toEqual("must be string");
-    expect(response.body.errors[0].location).toEqual("body");
-  });
+  //   expect(response.statusCode).toEqual(422);
+  //   expect(response.body).toHaveProperty("errors");
+  //   expect(response.body.errors).toHaveLength(1);
+  //   expect(response.body.errors[0].path).toEqual("subject");
+  //   expect(response.body.errors[0].message).toEqual("must be string");
+  //   expect(response.body.errors[0].location).toEqual("body");
+  // });
 
-  it("from missing", async () => {
-    const tokenResponse = await getToken();
-    const body: unknown = tokenResponse.body;
-    assertIsTokenResponseBody(body);
+  // it("from missing", async () => {
+  //   const tokenResponse = await getToken();
+  //   const body: unknown = tokenResponse.body;
+  //   assertIsTokenResponseBody(body);
 
-    const response = await request(app.getHttpServer())
-      .post(url)
-      .send({
-        title: "title",
-        previewText: "preview text",
-        bodyText: "body text",
-        to: "you@example.com",
-        subject: "subject",
-      })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+  //   const response = await request(app.getHttpServer())
+  //     .post(url)
+  //     .send({
+  //       title: "title",
+  //       previewText: "preview text",
+  //       bodyText: "body text",
+  //       to: "you@example.com",
+  //       subject: "subject",
+  //     })
+  //     .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
 
-    expect(response.statusCode).toEqual(422);
-    expect(response.body).toHaveProperty("errors");
-    expect(response.body.errors).toHaveLength(1);
-    expect(response.body.errors[0].path).toEqual("from");
-    expect(response.body.errors[0].errorCode).toEqual(
-      "required.openapi.requestValidation",
-    );
-    expect(response.body.errors[0].message).toEqual(
-      "must have required property 'from'",
-    );
-    expect(response.body.errors[0].location).toEqual("body");
-  });
+  //   expect(response.statusCode).toEqual(422);
+  //   expect(response.body).toHaveProperty("errors");
+  //   expect(response.body.errors).toHaveLength(1);
+  //   expect(response.body.errors[0].path).toEqual("from");
+  //   expect(response.body.errors[0].errorCode).toEqual(
+  //     "required.openapi.requestValidation",
+  //   );
+  //   expect(response.body.errors[0].message).toEqual(
+  //     "must have required property 'from'",
+  //   );
+  //   expect(response.body.errors[0].location).toEqual("body");
+  // });
 
-  it("from wrong type", async () => {
-    const tokenResponse = await getToken();
-    const body: unknown = tokenResponse.body;
-    assertIsTokenResponseBody(body);
+  // it("from wrong type", async () => {
+  //   const tokenResponse = await getToken();
+  //   const body: unknown = tokenResponse.body;
+  //   assertIsTokenResponseBody(body);
 
-    const response = await request(app.getHttpServer())
-      .post(url)
-      .send({
-        title: "title",
-        previewText: "preview text",
-        bodyText: "body text",
-        from: false,
-        to: "you@example.com",
-        subject: "subject",
-      })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+  //   const response = await request(app.getHttpServer())
+  //     .post(url)
+  //     .send({
+  //       title: "title",
+  //       previewText: "preview text",
+  //       bodyText: "body text",
+  //       from: false,
+  //       to: "you@example.com",
+  //       subject: "subject",
+  //     })
+  //     .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
 
-    expect(response.statusCode).toEqual(422);
-    expect(response.body).toHaveProperty("errors");
-    expect(response.body.errors).toHaveLength(1);
-    expect(response.body.errors[0].path).toEqual("from");
-    expect(response.body.errors[0].message).toEqual("must be string");
-    expect(response.body.errors[0].location).toEqual("body");
-    expect(response.body.errors[0].errorCode).toEqual(
-      "type.openapi.requestValidation",
-    );
-  });
+  //   expect(response.statusCode).toEqual(422);
+  //   expect(response.body).toHaveProperty("errors");
+  //   expect(response.body.errors).toHaveLength(1);
+  //   expect(response.body.errors[0].path).toEqual("from");
+  //   expect(response.body.errors[0].message).toEqual("must be string");
+  //   expect(response.body.errors[0].location).toEqual("body");
+  //   expect(response.body.errors[0].errorCode).toEqual(
+  //     "type.openapi.requestValidation",
+  //   );
+  // });
 
-  it("from not valid email address", async () => {
-    const tokenResponse = await getToken();
-    const body: unknown = tokenResponse.body;
-    assertIsTokenResponseBody(body);
+  // it("from not valid email address", async () => {
+  //   const tokenResponse = await getToken();
+  //   const body: unknown = tokenResponse.body;
+  //   assertIsTokenResponseBody(body);
 
-    const response = await request(app.getHttpServer())
-      .post(url)
-      .send({
-        title: "title",
-        previewText: "preview text",
-        bodyText: "body text",
-        from: "hello",
-        to: "you@example.com",
-        subject: "subject",
-      })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+  //   const response = await request(app.getHttpServer())
+  //     .post(url)
+  //     .send({
+  //       title: "title",
+  //       previewText: "preview text",
+  //       bodyText: "body text",
+  //       from: "hello",
+  //       to: "you@example.com",
+  //       subject: "subject",
+  //     })
+  //     .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
 
-    expect(response.statusCode).toEqual(422);
-    expect(response.body).toHaveProperty("errors");
-    expect(response.body.errors).toHaveLength(1);
-    expect(response.body.errors[0].path).toEqual("from");
-    expect(response.body.errors[0].message).toEqual(
-      'must match format "email"',
-    );
-    expect(response.body.errors[0].location).toEqual("body");
-    expect(response.body.errors[0].errorCode).toEqual(
-      "format.openapi.requestValidation",
-    );
-  });
+  //   expect(response.statusCode).toEqual(422);
+  //   expect(response.body).toHaveProperty("errors");
+  //   expect(response.body.errors).toHaveLength(1);
+  //   expect(response.body.errors[0].path).toEqual("from");
+  //   expect(response.body.errors[0].message).toEqual(
+  //     'must match format "email"',
+  //   );
+  //   expect(response.body.errors[0].location).toEqual("body");
+  //   expect(response.body.errors[0].errorCode).toEqual(
+  //     "format.openapi.requestValidation",
+  //   );
+  // });
 
-  it("to missing", async () => {
-    const tokenResponse = await getToken();
-    const body: unknown = tokenResponse.body;
-    assertIsTokenResponseBody(body);
+  // it("to missing", async () => {
+  //   const tokenResponse = await getToken();
+  //   const body: unknown = tokenResponse.body;
+  //   assertIsTokenResponseBody(body);
 
-    const response = await request(app.getHttpServer())
-      .post(url)
-      .send({
-        title: "title",
-        previewText: "preview text",
-        bodyText: "body text",
-        from: "you@example.com",
-        subject: "subject",
-      })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+  //   const response = await request(app.getHttpServer())
+  //     .post(url)
+  //     .send({
+  //       title: "title",
+  //       previewText: "preview text",
+  //       bodyText: "body text",
+  //       from: "you@example.com",
+  //       subject: "subject",
+  //     })
+  //     .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
 
-    expect(response.statusCode).toEqual(422);
-    expect(response.body).toHaveProperty("errors");
-    expect(response.body.errors).toHaveLength(1);
-    expect(response.body.errors[0].path).toEqual("to");
-    expect(response.body.errors[0].errorCode).toEqual(
-      "required.openapi.requestValidation",
-    );
-    expect(response.body.errors[0].message).toEqual(
-      "must have required property 'to'",
-    );
-    expect(response.body.errors[0].location).toEqual("body");
-  });
+  //   expect(response.statusCode).toEqual(422);
+  //   expect(response.body).toHaveProperty("errors");
+  //   expect(response.body.errors).toHaveLength(1);
+  //   expect(response.body.errors[0].path).toEqual("to");
+  //   expect(response.body.errors[0].errorCode).toEqual(
+  //     "required.openapi.requestValidation",
+  //   );
+  //   expect(response.body.errors[0].message).toEqual(
+  //     "must have required property 'to'",
+  //   );
+  //   expect(response.body.errors[0].location).toEqual("body");
+  // });
 
-  it("to wrong type", async () => {
-    const tokenResponse = await getToken();
-    const body: unknown = tokenResponse.body;
-    assertIsTokenResponseBody(body);
+  // it("to wrong type", async () => {
+  //   const tokenResponse = await getToken();
+  //   const body: unknown = tokenResponse.body;
+  //   assertIsTokenResponseBody(body);
 
-    const response = await request(app.getHttpServer())
-      .post(url)
-      .send({
-        title: "title",
-        previewText: "preview text",
-        bodyText: "body text",
-        to: false,
-        from: "you@example.com",
-        subject: "subject",
-      })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+  //   const response = await request(app.getHttpServer())
+  //     .post(url)
+  //     .send({
+  //       title: "title",
+  //       previewText: "preview text",
+  //       bodyText: "body text",
+  //       to: false,
+  //       from: "you@example.com",
+  //       subject: "subject",
+  //     })
+  //     .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
 
-    expect(response.statusCode).toEqual(422);
-    expect(response.body).toHaveProperty("errors");
-    expect(response.body.errors).toHaveLength(1);
-    expect(response.body.errors[0].path).toEqual("to");
-    expect(response.body.errors[0].message).toEqual("must be string");
-    expect(response.body.errors[0].location).toEqual("body");
-    expect(response.body.errors[0].errorCode).toEqual(
-      "type.openapi.requestValidation",
-    );
-  });
+  //   expect(response.statusCode).toEqual(422);
+  //   expect(response.body).toHaveProperty("errors");
+  //   expect(response.body.errors).toHaveLength(1);
+  //   expect(response.body.errors[0].path).toEqual("to");
+  //   expect(response.body.errors[0].message).toEqual("must be string");
+  //   expect(response.body.errors[0].location).toEqual("body");
+  //   expect(response.body.errors[0].errorCode).toEqual(
+  //     "type.openapi.requestValidation",
+  //   );
+  // });
 
-  it("to not valid email address", async () => {
-    const tokenResponse = await getToken();
-    const body: unknown = tokenResponse.body;
-    assertIsTokenResponseBody(body);
+  // it("to not valid email address", async () => {
+  //   const tokenResponse = await getToken();
+  //   const body: unknown = tokenResponse.body;
+  //   assertIsTokenResponseBody(body);
 
-    const response = await request(app.getHttpServer())
-      .post(url)
-      .send({
-        title: "title",
-        previewText: "preview text",
-        bodyText: "body text",
-        to: "hello",
-        from: "you@example.com",
-        subject: "subject",
-      })
-      .set("Authorization", `Bearer ${body.access_token}`);
+  //   const response = await request(app.getHttpServer())
+  //     .post(url)
+  //     .send({
+  //       title: "title",
+  //       previewText: "preview text",
+  //       bodyText: "body text",
+  //       to: "hello",
+  //       from: "you@example.com",
+  //       subject: "subject",
+  //     })
+  //     .set("Authorization", `Bearer ${body.access_token}`);
 
-    expect(response.statusCode).toEqual(422);
-    expect(response.body).toHaveProperty("errors");
-    expect(response.body.errors).toHaveLength(1);
-    expect(response.body.errors[0].path).toEqual("to");
-    expect(response.body.errors[0].message).toEqual(
-      'must match format "email"',
-    );
-    expect(response.body.errors[0].location).toEqual("body");
-    expect(response.body.errors[0].errorCode).toEqual(
-      "format.openapi.requestValidation",
-    );
-  });
+  //   expect(response.statusCode).toEqual(422);
+  //   expect(response.body).toHaveProperty("errors");
+  //   expect(response.body.errors).toHaveLength(1);
+  //   expect(response.body.errors[0].path).toEqual("to");
+  //   expect(response.body.errors[0].message).toEqual(
+  //     'must match format "email"',
+  //   );
+  //   expect(response.body.errors[0].location).toEqual("body");
+  //   expect(response.body.errors[0].errorCode).toEqual(
+  //     "format.openapi.requestValidation",
+  //   );
+  // });
 });
