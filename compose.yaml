@@ -5,6 +5,7 @@ services:
       dockerfile: Containerfile
     command: ["yarn", "run", "email"]
     environment:
+      APP_BASE_URL: http://localhost:3001
       NODE_ENV: development
     ports:
       - "3000:3000"
