@@ -2683,10 +2683,10 @@
   dependencies:
     marked "^15.0.12"
 
-"@react-email/preview-server@5.0.4":
-  version "5.0.4"
-  resolved "https://registry.yarnpkg.com/@react-email/preview-server/-/preview-server-5.0.4.tgz#4d99d9447a264dac3947117069cf0ab9ae9f30f5"
-  integrity sha512-i3kUTvE369ly32ZUMmfjIjb9NK8F19S8EgH/KzUvPWOwfXwePJK3AZTBabqGPCqEDRmDe7THEH6lDf2XWC73lg==
+"@react-email/preview-server@5.0.5":
+  version "5.0.5"
+  resolved "https://registry.yarnpkg.com/@react-email/preview-server/-/preview-server-5.0.5.tgz#75861f3bdfab7e2896ff43b72c3333c1a2018c9e"
+  integrity sha512-dNZ8G7PqQ+BUGkBRJgo+8PDjEtRj8c2vRzUMA3s7Q6zTfXFrBrSchG37UT5TsL6zi/RAOVN2P0wBZqz60J3hsw==
   dependencies:
     next "16.0.1"
 
