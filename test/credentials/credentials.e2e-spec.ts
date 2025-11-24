@@ -19,6 +19,7 @@ import {
 } from 'test/auth';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { SecretClient } from '@azure/keyvault-secrets';
+import { deleteCredentials } from 'test/utils';
 
 const requestBody = {
   username: 'test_smtp_user',
@@ -55,25 +56,6 @@ function assertIsValidResponseBody(obj: any): asserts obj is ValidResponseBody {
     throw new Error('Is not a valid resonse body!');
   }
 }
-
-const deleteCredentials = async (client: SecretClient) => {
-  try {
-    const poller = await client.beginDeleteSecret(
-      'ccd03ed4-6873-422f-828b-38a39e358fc9-smtpUser',
-    );
-    await poller.pollUntilDone();
-  } catch (err) {
-    console.error(err);
-  }
-  try {
-    const poller = await client.beginDeleteSecret(
-      'ccd03ed4-6873-422f-828b-38a39e358fc9-smtpPass',
-    );
-    await poller.pollUntilDone();
-  } catch (err) {
-    console.error(err);
-  }
-};
 
 describe('CredentialsController (e2e)', () => {
   let app: INestApplication<App>;
