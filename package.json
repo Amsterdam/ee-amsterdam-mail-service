@@ -38,7 +38,7 @@
     "nodemailer": "^7.0.10",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "react-email": "4.3.1",
+    "react-email": "5.0.5",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
@@ -48,7 +48,7 @@
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.1.8",
-    "@react-email/preview-server": "5.0.4",
+    "@react-email/preview-server": "5.0.5",
     "@swc/cli": "^0.7.8",
     "@swc/core": "^1.14.0",
     "@swc/plugin-transform-imports": "^10.0.0",

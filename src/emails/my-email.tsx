@@ -66,5 +66,7 @@ Email.PreviewProps = {
   title: 'My Email Title',
   previewText: 'A nice preview text for mail clients',
   bodyText: 'A quick brown fox jumps over the lazy dog.',
-  imageSrc: '/amsterdam-logo.png',
+  imageSrc: process.env.APP_BASE_URL
+    ? `${process.env.APP_BASE_URL}/amsterdam-logo.png`
+    : '/amsterdam-logo.png',
 };
