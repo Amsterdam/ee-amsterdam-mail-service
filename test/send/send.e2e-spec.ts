@@ -498,34 +498,32 @@ describe('SendController (e2e)', () => {
     expect(validationResponseBody.statusCode).toEqual(400);
   });
 
-  // it("from missing", async () => {
-  //   const tokenResponse = await getToken();
-  //   const body: unknown = tokenResponse.body;
-  //   assertIsTokenResponseBody(body);
+  it("from missing", async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
 
-  //   const response = await request(app.getHttpServer())
-  //     .post(url)
-  //     .send({
-  //       title: "title",
-  //       previewText: "preview text",
-  //       bodyText: "body text",
-  //       to: "you@example.com",
-  //       subject: "subject",
-  //     })
-  //     .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send({
+        title: "title",
+        previewText: "preview text",
+        bodyText: "body text",
+        to: "you@example.com",
+        subject: "subject",
+      })
+      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
 
-  //   expect(response.statusCode).toEqual(422);
-  //   expect(response.body).toHaveProperty("errors");
-  //   expect(response.body.errors).toHaveLength(1);
-  //   expect(response.body.errors[0].path).toEqual("from");
-  //   expect(response.body.errors[0].errorCode).toEqual(
-  //     "required.openapi.requestValidation",
-  //   );
-  //   expect(response.body.errors[0].message).toEqual(
-  //     "must have required property 'from'",
-  //   );
-  //   expect(response.body.errors[0].location).toEqual("body");
-  // });
+    expect(response.statusCode).toEqual(400);
+    const validationResponseBody: unknown = response.body;
+
+    assertIsValidationResponseBody(validationResponseBody);
+
+    expect(validationResponseBody.message).toHaveLength(1);
+    expect(validationResponseBody.message[0]).toEqual('from must be an email');
+    expect(validationResponseBody.error).toEqual("Bad Request");
+    expect(validationResponseBody.statusCode).toEqual(400);
+  });
 
   // it("from wrong type", async () => {
   //   const tokenResponse = await getToken();
