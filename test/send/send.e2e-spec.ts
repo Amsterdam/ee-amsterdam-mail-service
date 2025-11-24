@@ -149,22 +149,22 @@ describe('SendController (e2e)', () => {
     await deleteCredentials(app.get(SecretClient));
   });
 
-  // it("It should not send mail with a valid token, but no credentials in keyvault", async () => {
-  //   const tokenResponse = await getToken();
-  //   const body: unknown = tokenResponse.body;
-  //   assertIsTokenResponseBody(body);
+  it("It should not send mail with a valid token, but no credentials in keyvault", async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
 
-  //   const response = await request(app.getHttpServer())
-  //     .post(url)
-  //     .send(requestBody)
-  //     .set("Authorization", `Bearer ${body.access_token}`);
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send(requestBody)
+      .set("Authorization", `Bearer ${body.access_token}`);
 
-  //   expect(response.statusCode).toEqual(404);
-  //   expect(response.body).toHaveProperty("message");
-  //   expect(response.body.message).toEqual(
-  //     "Credentials not found. Did you add them using the /credentials endpoint?",
-  //   );
-  // });
+    expect(response.statusCode).toEqual(404);
+    expect(response.body).toHaveProperty("message");
+    expect(response.body.message).toEqual(
+      "Credentials not found. Did you add them using the /credentials endpoint?",
+    );
+  });
 
   // it("title missing", async () => {
   //   const tokenResponse = await getToken();
