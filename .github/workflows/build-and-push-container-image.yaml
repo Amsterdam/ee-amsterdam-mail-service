@@ -16,4 +16,4 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build container image
-        run: docker buildx bake --file docker-compose.yaml --push mail-service
+        run: docker buildx bake --file compose.yaml --push mail-service
