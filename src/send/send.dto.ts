@@ -32,6 +32,7 @@ export class SendRequestDto {
 
   @ApiProperty()
   @IsString()
+  @MinLength(2)
   // @ts-expect-error TS2564
   subject: string;
 }
