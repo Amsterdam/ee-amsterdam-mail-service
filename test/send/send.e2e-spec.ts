@@ -21,7 +21,11 @@ import {
   test_invalid_typ_header,
   test_no_token_provided,
 } from 'test/auth';
-import { assertIsValidationResponseBody, deleteCredentials } from 'test/utils';
+import {
+  assertIsValidationResponseBody,
+  assertIsValidResponseBody,
+  deleteCredentials,
+} from 'test/utils';
 import { SecretClient } from '@azure/keyvault-secrets';
 
 const mailpitClient = new MailpitClient('http://mailpit:8025');
@@ -30,10 +34,9 @@ const to = 'you@example.com';
 const subject = 'My subject';
 const expectedText = `MY TITLE\r\n\r\n\r\nBODY TEXT\r\n\r\n * list1\r\n * list2\r\n\r\n----------------------------------------\r\n\r\nDisclaimer teksten zijn altijd superleuk om te lezen!\r\n\r\nAmsterdam.nl https://amsterdam.nl/\r\n\r\n14020 tel:14020`;
 const getExpectedHtml = (id: string): string => {
-  const expected = readFileSync(
-    './test/resources/sendMailBody.html',
-    { encoding: 'utf-8' },
-  );
+  const expected = readFileSync('./test/resources/sendMailBody.html', {
+    encoding: 'utf-8',
+  });
   return format(expected, id, id);
 };
 const requestBody = {
@@ -99,7 +102,7 @@ describe('SendController (e2e)', () => {
     await test_invalid_issuer(app, url, requestBody);
   });
 
-  it("It should send mail with a valid token", async () => {
+  it('It should send mail with a valid token', async () => {
     await mailpitClient.deleteMessages();
 
     const tokenResponse = await getToken();
@@ -107,20 +110,24 @@ describe('SendController (e2e)', () => {
     assertIsTokenResponseBody(body);
 
     const credentialsResponse = await request(app.getHttpServer())
-      .post("/credentials")
-      .send({ username: "test_smtp_user", password: "smtp_secret" })
-      .set("Authorization", `Bearer ${body.access_token}`);
+      .post('/credentials')
+      .send({ username: 'test_smtp_user', password: 'smtp_secret' })
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(credentialsResponse.statusCode).toEqual(200);
 
     const response = await request(app.getHttpServer())
       .post(url)
       .send(requestBody)
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(200);
-    expect(response.body).toHaveProperty("message");
-    expect(response.body.message).toEqual("Mail sent successfully!");
+    expect(response.body).toHaveProperty('message');
+
+    const responseBody: unknown = response.body;
+    assertIsValidResponseBody(responseBody);
+
+    expect(responseBody.message).toEqual('Mail sent successfully!');
 
     const mailpitResponse = await mailpitClient.listMessages();
     expect(mailpitResponse.total).toEqual(1);
@@ -142,14 +149,14 @@ describe('SendController (e2e)', () => {
     expect(messageHtml).toEqual(getExpectedHtml(messageSummary.ID));
 
     const searchResponse = await mailpitClient.searchMessages({
-      query: "has:inline",
+      query: 'has:inline',
     });
     expect(searchResponse.messages_count).toEqual(1);
 
     await deleteCredentials(app.get(SecretClient));
   });
 
-  it("It should not send mail with a valid token, but no credentials in keyvault", async () => {
+  it('It should not send mail with a valid token, but no credentials in keyvault', async () => {
     const tokenResponse = await getToken();
     const body: unknown = tokenResponse.body;
     assertIsTokenResponseBody(body);
@@ -157,16 +164,19 @@ describe('SendController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(url)
       .send(requestBody)
-      .set("Authorization", `Bearer ${body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(404);
-    expect(response.body).toHaveProperty("message");
-    expect(response.body.message).toEqual(
-      "Credentials not found. Did you add them using the /credentials endpoint?",
+
+    const responseBody: unknown = response.body;
+    assertIsValidResponseBody(responseBody);
+
+    expect(responseBody.message).toEqual(
+      'Credentials not found. Did you add them using the /credentials endpoint?',
     );
   });
 
-  it("title missing", async () => {
+  it('title missing', async () => {
     const tokenResponse = await getToken();
     const body: unknown = tokenResponse.body;
     assertIsTokenResponseBody(body);
@@ -174,13 +184,13 @@ describe('SendController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(url)
       .send({
-        previewText: "preview text",
-        bodyText: "body text",
-        from: "me@example.com",
-        to: "you@example.com",
-        subject: "subject",
+        previewText: 'preview text',
+        bodyText: 'body text',
+        from: 'me@example.com',
+        to: 'you@example.com',
+        subject: 'subject',
       })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
 
@@ -189,11 +199,11 @@ describe('SendController (e2e)', () => {
 
     expect(validationResponseBody.message).toHaveLength(2);
     expect(validationResponseBody.message[1]).toEqual('title must be a string');
-    expect(validationResponseBody.error).toEqual("Bad Request");
+    expect(validationResponseBody.error).toEqual('Bad Request');
     expect(validationResponseBody.statusCode).toEqual(400);
   });
 
-  it("title too short", async () => {
+  it('title too short', async () => {
     const tokenResponse = await getToken();
     const body: unknown = tokenResponse.body;
     assertIsTokenResponseBody(body);
@@ -201,14 +211,14 @@ describe('SendController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(url)
       .send({
-        title: "a",
-        previewText: "preview text",
-        bodyText: "body text",
-        from: "me@example.com",
-        to: "you@example.com",
-        subject: "subject",
+        title: 'a',
+        previewText: 'preview text',
+        bodyText: 'body text',
+        from: 'me@example.com',
+        to: 'you@example.com',
+        subject: 'subject',
       })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
 
@@ -216,12 +226,14 @@ describe('SendController (e2e)', () => {
     assertIsValidationResponseBody(validationResponseBody);
 
     expect(validationResponseBody.message).toHaveLength(1);
-    expect(validationResponseBody.message[0]).toEqual('title must be longer than or equal to 2 characters');
-    expect(validationResponseBody.error).toEqual("Bad Request");
+    expect(validationResponseBody.message[0]).toEqual(
+      'title must be longer than or equal to 2 characters',
+    );
+    expect(validationResponseBody.error).toEqual('Bad Request');
     expect(validationResponseBody.statusCode).toEqual(400);
   });
 
-  it("title wrong type", async () => {
+  it('title wrong type', async () => {
     const tokenResponse = await getToken();
     const body: unknown = tokenResponse.body;
     assertIsTokenResponseBody(body);
@@ -230,13 +242,13 @@ describe('SendController (e2e)', () => {
       .post(url)
       .send({
         title: false,
-        previewText: "preview text",
-        bodyText: "body text",
-        from: "me@example.com",
-        to: "you@example.com",
-        subject: "subject",
+        previewText: 'preview text',
+        bodyText: 'body text',
+        from: 'me@example.com',
+        to: 'you@example.com',
+        subject: 'subject',
       })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
 
@@ -245,11 +257,11 @@ describe('SendController (e2e)', () => {
 
     expect(validationResponseBody.message).toHaveLength(2);
     expect(validationResponseBody.message[1]).toEqual('title must be a string');
-    expect(validationResponseBody.error).toEqual("Bad Request");
+    expect(validationResponseBody.error).toEqual('Bad Request');
     expect(validationResponseBody.statusCode).toEqual(400);
   });
 
-  it("previewText missing", async () => {
+  it('previewText missing', async () => {
     const tokenResponse = await getToken();
     const body: unknown = tokenResponse.body;
     assertIsTokenResponseBody(body);
@@ -257,13 +269,13 @@ describe('SendController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(url)
       .send({
-        title: "title",
-        bodyText: "body text",
-        from: "me@example.com",
-        to: "you@example.com",
-        subject: "subject",
+        title: 'title',
+        bodyText: 'body text',
+        from: 'me@example.com',
+        to: 'you@example.com',
+        subject: 'subject',
       })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
     const validationResponseBody: unknown = response.body;
@@ -271,12 +283,14 @@ describe('SendController (e2e)', () => {
     assertIsValidationResponseBody(validationResponseBody);
 
     expect(validationResponseBody.message).toHaveLength(2);
-    expect(validationResponseBody.message[1]).toEqual('previewText must be a string');
-    expect(validationResponseBody.error).toEqual("Bad Request");
+    expect(validationResponseBody.message[1]).toEqual(
+      'previewText must be a string',
+    );
+    expect(validationResponseBody.error).toEqual('Bad Request');
     expect(validationResponseBody.statusCode).toEqual(400);
   });
 
-  it("previewText too short", async () => {
+  it('previewText too short', async () => {
     const tokenResponse = await getToken();
     const body: unknown = tokenResponse.body;
     assertIsTokenResponseBody(body);
@@ -284,14 +298,14 @@ describe('SendController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(url)
       .send({
-        title: "title",
-        previewText: "a",
-        bodyText: "body text",
-        from: "me@example.com",
-        to: "you@example.com",
-        subject: "subject",
+        title: 'title',
+        previewText: 'a',
+        bodyText: 'body text',
+        from: 'me@example.com',
+        to: 'you@example.com',
+        subject: 'subject',
       })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
 
@@ -299,12 +313,14 @@ describe('SendController (e2e)', () => {
     assertIsValidationResponseBody(validationResponseBody);
 
     expect(validationResponseBody.message).toHaveLength(1);
-    expect(validationResponseBody.message[0]).toEqual('previewText must be longer than or equal to 2 characters');
-    expect(validationResponseBody.error).toEqual("Bad Request");
+    expect(validationResponseBody.message[0]).toEqual(
+      'previewText must be longer than or equal to 2 characters',
+    );
+    expect(validationResponseBody.error).toEqual('Bad Request');
     expect(validationResponseBody.statusCode).toEqual(400);
   });
 
-  it("previewText wrong type", async () => {
+  it('previewText wrong type', async () => {
     const tokenResponse = await getToken();
     const body: unknown = tokenResponse.body;
     assertIsTokenResponseBody(body);
@@ -312,14 +328,14 @@ describe('SendController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(url)
       .send({
-        title: "title",
+        title: 'title',
         previewText: false,
-        bodyText: "body text",
-        from: "me@example.com",
-        to: "you@example.com",
-        subject: "subject",
+        bodyText: 'body text',
+        from: 'me@example.com',
+        to: 'you@example.com',
+        subject: 'subject',
       })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
 
@@ -327,12 +343,14 @@ describe('SendController (e2e)', () => {
     assertIsValidationResponseBody(validationResponseBody);
 
     expect(validationResponseBody.message).toHaveLength(2);
-    expect(validationResponseBody.message[1]).toEqual('previewText must be a string');
-    expect(validationResponseBody.error).toEqual("Bad Request");
+    expect(validationResponseBody.message[1]).toEqual(
+      'previewText must be a string',
+    );
+    expect(validationResponseBody.error).toEqual('Bad Request');
     expect(validationResponseBody.statusCode).toEqual(400);
   });
 
-  it("bodyText missing", async () => {
+  it('bodyText missing', async () => {
     const tokenResponse = await getToken();
     const body: unknown = tokenResponse.body;
     assertIsTokenResponseBody(body);
@@ -340,13 +358,13 @@ describe('SendController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(url)
       .send({
-        title: "title",
-        previewText: "preview text",
-        from: "me@example.com",
-        to: "you@example.com",
-        subject: "subject",
+        title: 'title',
+        previewText: 'preview text',
+        from: 'me@example.com',
+        to: 'you@example.com',
+        subject: 'subject',
       })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
     const validationResponseBody: unknown = response.body;
@@ -354,12 +372,14 @@ describe('SendController (e2e)', () => {
     assertIsValidationResponseBody(validationResponseBody);
 
     expect(validationResponseBody.message).toHaveLength(2);
-    expect(validationResponseBody.message[1]).toEqual('bodyText must be a string');
-    expect(validationResponseBody.error).toEqual("Bad Request");
+    expect(validationResponseBody.message[1]).toEqual(
+      'bodyText must be a string',
+    );
+    expect(validationResponseBody.error).toEqual('Bad Request');
     expect(validationResponseBody.statusCode).toEqual(400);
   });
 
-  it("bodyText too short", async () => {
+  it('bodyText too short', async () => {
     const tokenResponse = await getToken();
     const body: unknown = tokenResponse.body;
     assertIsTokenResponseBody(body);
@@ -367,14 +387,14 @@ describe('SendController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(url)
       .send({
-        title: "title",
-        previewText: "preview text",
-        bodyText: "a",
-        from: "me@example.com",
-        to: "you@example.com",
-        subject: "subject",
+        title: 'title',
+        previewText: 'preview text',
+        bodyText: 'a',
+        from: 'me@example.com',
+        to: 'you@example.com',
+        subject: 'subject',
       })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
 
@@ -382,12 +402,14 @@ describe('SendController (e2e)', () => {
     assertIsValidationResponseBody(validationResponseBody);
 
     expect(validationResponseBody.message).toHaveLength(1);
-    expect(validationResponseBody.message[0]).toEqual('bodyText must be longer than or equal to 2 characters');
-    expect(validationResponseBody.error).toEqual("Bad Request");
+    expect(validationResponseBody.message[0]).toEqual(
+      'bodyText must be longer than or equal to 2 characters',
+    );
+    expect(validationResponseBody.error).toEqual('Bad Request');
     expect(validationResponseBody.statusCode).toEqual(400);
   });
 
-  it("bodyText wrong type", async () => {
+  it('bodyText wrong type', async () => {
     const tokenResponse = await getToken();
     const body: unknown = tokenResponse.body;
     assertIsTokenResponseBody(body);
@@ -395,14 +417,14 @@ describe('SendController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(url)
       .send({
-        title: "title",
-        previewText: "preview text",
+        title: 'title',
+        previewText: 'preview text',
         bodyText: false,
-        from: "me@example.com",
-        to: "you@example.com",
-        subject: "subject",
+        from: 'me@example.com',
+        to: 'you@example.com',
+        subject: 'subject',
       })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
 
@@ -410,12 +432,14 @@ describe('SendController (e2e)', () => {
     assertIsValidationResponseBody(validationResponseBody);
 
     expect(validationResponseBody.message).toHaveLength(2);
-    expect(validationResponseBody.message[1]).toEqual('bodyText must be a string');
-    expect(validationResponseBody.error).toEqual("Bad Request");
+    expect(validationResponseBody.message[1]).toEqual(
+      'bodyText must be a string',
+    );
+    expect(validationResponseBody.error).toEqual('Bad Request');
     expect(validationResponseBody.statusCode).toEqual(400);
   });
 
-  it("subject missing", async () => {
+  it('subject missing', async () => {
     const tokenResponse = await getToken();
     const body: unknown = tokenResponse.body;
     assertIsTokenResponseBody(body);
@@ -423,13 +447,13 @@ describe('SendController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(url)
       .send({
-        title: "title",
-        previewText: "preview text",
-        bodyText: "body text",
-        from: "me@example.com",
-        to: "you@example.com",
+        title: 'title',
+        previewText: 'preview text',
+        bodyText: 'body text',
+        from: 'me@example.com',
+        to: 'you@example.com',
       })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
     const validationResponseBody: unknown = response.body;
@@ -437,12 +461,14 @@ describe('SendController (e2e)', () => {
     assertIsValidationResponseBody(validationResponseBody);
 
     expect(validationResponseBody.message).toHaveLength(2);
-    expect(validationResponseBody.message[1]).toEqual('subject must be a string');
-    expect(validationResponseBody.error).toEqual("Bad Request");
+    expect(validationResponseBody.message[1]).toEqual(
+      'subject must be a string',
+    );
+    expect(validationResponseBody.error).toEqual('Bad Request');
     expect(validationResponseBody.statusCode).toEqual(400);
   });
 
-  it("subject too short", async () => {
+  it('subject too short', async () => {
     const tokenResponse = await getToken();
     const body: unknown = tokenResponse.body;
     assertIsTokenResponseBody(body);
@@ -450,14 +476,14 @@ describe('SendController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(url)
       .send({
-        title: "title",
-        previewText: "preview text",
-        bodyText: "body text",
-        from: "me@example.com",
-        to: "you@example.com",
-        subject: "s",
+        title: 'title',
+        previewText: 'preview text',
+        bodyText: 'body text',
+        from: 'me@example.com',
+        to: 'you@example.com',
+        subject: 's',
       })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
 
@@ -465,12 +491,14 @@ describe('SendController (e2e)', () => {
     assertIsValidationResponseBody(validationResponseBody);
 
     expect(validationResponseBody.message).toHaveLength(1);
-    expect(validationResponseBody.message[0]).toEqual('subject must be longer than or equal to 2 characters');
-    expect(validationResponseBody.error).toEqual("Bad Request");
+    expect(validationResponseBody.message[0]).toEqual(
+      'subject must be longer than or equal to 2 characters',
+    );
+    expect(validationResponseBody.error).toEqual('Bad Request');
     expect(validationResponseBody.statusCode).toEqual(400);
   });
 
-  it("subject wrong type", async () => {
+  it('subject wrong type', async () => {
     const tokenResponse = await getToken();
     const body: unknown = tokenResponse.body;
     assertIsTokenResponseBody(body);
@@ -478,14 +506,14 @@ describe('SendController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(url)
       .send({
-        title: "title",
-        previewText: "preview text",
-        bodyText: "body text",
-        from: "me@example.com",
-        to: "you@example.com",
+        title: 'title',
+        previewText: 'preview text',
+        bodyText: 'body text',
+        from: 'me@example.com',
+        to: 'you@example.com',
         subject: false,
       })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
 
@@ -493,12 +521,14 @@ describe('SendController (e2e)', () => {
     assertIsValidationResponseBody(validationResponseBody);
 
     expect(validationResponseBody.message).toHaveLength(2);
-    expect(validationResponseBody.message[1]).toEqual('subject must be a string');
-    expect(validationResponseBody.error).toEqual("Bad Request");
+    expect(validationResponseBody.message[1]).toEqual(
+      'subject must be a string',
+    );
+    expect(validationResponseBody.error).toEqual('Bad Request');
     expect(validationResponseBody.statusCode).toEqual(400);
   });
 
-  it("from missing", async () => {
+  it('from missing', async () => {
     const tokenResponse = await getToken();
     const body: unknown = tokenResponse.body;
     assertIsTokenResponseBody(body);
@@ -506,13 +536,13 @@ describe('SendController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(url)
       .send({
-        title: "title",
-        previewText: "preview text",
-        bodyText: "body text",
-        to: "you@example.com",
-        subject: "subject",
+        title: 'title',
+        previewText: 'preview text',
+        bodyText: 'body text',
+        to: 'you@example.com',
+        subject: 'subject',
       })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
     const validationResponseBody: unknown = response.body;
@@ -521,11 +551,11 @@ describe('SendController (e2e)', () => {
 
     expect(validationResponseBody.message).toHaveLength(1);
     expect(validationResponseBody.message[0]).toEqual('from must be an email');
-    expect(validationResponseBody.error).toEqual("Bad Request");
+    expect(validationResponseBody.error).toEqual('Bad Request');
     expect(validationResponseBody.statusCode).toEqual(400);
   });
 
-  it("from wrong type", async () => {
+  it('from wrong type', async () => {
     const tokenResponse = await getToken();
     const body: unknown = tokenResponse.body;
     assertIsTokenResponseBody(body);
@@ -533,14 +563,14 @@ describe('SendController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(url)
       .send({
-        title: "title",
-        previewText: "preview text",
-        bodyText: "body text",
+        title: 'title',
+        previewText: 'preview text',
+        bodyText: 'body text',
         from: false,
-        to: "you@example.com",
-        subject: "subject",
+        to: 'you@example.com',
+        subject: 'subject',
       })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
 
@@ -549,11 +579,11 @@ describe('SendController (e2e)', () => {
 
     expect(validationResponseBody.message).toHaveLength(1);
     expect(validationResponseBody.message[0]).toEqual('from must be an email');
-    expect(validationResponseBody.error).toEqual("Bad Request");
+    expect(validationResponseBody.error).toEqual('Bad Request');
     expect(validationResponseBody.statusCode).toEqual(400);
   });
 
-  it("from not valid email address", async () => {
+  it('from not valid email address', async () => {
     const tokenResponse = await getToken();
     const body: unknown = tokenResponse.body;
     assertIsTokenResponseBody(body);
@@ -561,14 +591,14 @@ describe('SendController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(url)
       .send({
-        title: "title",
-        previewText: "preview text",
-        bodyText: "body text",
-        from: "hello",
-        to: "you@example.com",
-        subject: "subject",
+        title: 'title',
+        previewText: 'preview text',
+        bodyText: 'body text',
+        from: 'hello',
+        to: 'you@example.com',
+        subject: 'subject',
       })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
     const validationResponseBody: unknown = response.body;
@@ -577,11 +607,11 @@ describe('SendController (e2e)', () => {
 
     expect(validationResponseBody.message).toHaveLength(1);
     expect(validationResponseBody.message[0]).toEqual('from must be an email');
-    expect(validationResponseBody.error).toEqual("Bad Request");
+    expect(validationResponseBody.error).toEqual('Bad Request');
     expect(validationResponseBody.statusCode).toEqual(400);
   });
 
-  it("to missing", async () => {
+  it('to missing', async () => {
     const tokenResponse = await getToken();
     const body: unknown = tokenResponse.body;
     assertIsTokenResponseBody(body);
@@ -589,13 +619,13 @@ describe('SendController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(url)
       .send({
-        title: "title",
-        previewText: "preview text",
-        bodyText: "body text",
-        from: "you@example.com",
-        subject: "subject",
+        title: 'title',
+        previewText: 'preview text',
+        bodyText: 'body text',
+        from: 'you@example.com',
+        subject: 'subject',
       })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
     const validationResponseBody: unknown = response.body;
@@ -604,11 +634,11 @@ describe('SendController (e2e)', () => {
 
     expect(validationResponseBody.message).toHaveLength(1);
     expect(validationResponseBody.message[0]).toEqual('to must be an email');
-    expect(validationResponseBody.error).toEqual("Bad Request");
+    expect(validationResponseBody.error).toEqual('Bad Request');
     expect(validationResponseBody.statusCode).toEqual(400);
   });
 
-  it("to wrong type", async () => {
+  it('to wrong type', async () => {
     const tokenResponse = await getToken();
     const body: unknown = tokenResponse.body;
     assertIsTokenResponseBody(body);
@@ -616,14 +646,14 @@ describe('SendController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(url)
       .send({
-        title: "title",
-        previewText: "preview text",
-        bodyText: "body text",
+        title: 'title',
+        previewText: 'preview text',
+        bodyText: 'body text',
         to: false,
-        from: "you@example.com",
-        subject: "subject",
+        from: 'you@example.com',
+        subject: 'subject',
       })
-      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
     const validationResponseBody: unknown = response.body;
@@ -632,11 +662,11 @@ describe('SendController (e2e)', () => {
 
     expect(validationResponseBody.message).toHaveLength(1);
     expect(validationResponseBody.message[0]).toEqual('to must be an email');
-    expect(validationResponseBody.error).toEqual("Bad Request");
+    expect(validationResponseBody.error).toEqual('Bad Request');
     expect(validationResponseBody.statusCode).toEqual(400);
   });
 
-  it("to not valid email address", async () => {
+  it('to not valid email address', async () => {
     const tokenResponse = await getToken();
     const body: unknown = tokenResponse.body;
     assertIsTokenResponseBody(body);
@@ -644,14 +674,14 @@ describe('SendController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post(url)
       .send({
-        title: "title",
-        previewText: "preview text",
-        bodyText: "body text",
-        to: "hello",
-        from: "you@example.com",
-        subject: "subject",
+        title: 'title',
+        previewText: 'preview text',
+        bodyText: 'body text',
+        to: 'hello',
+        from: 'you@example.com',
+        subject: 'subject',
       })
-      .set("Authorization", `Bearer ${body.access_token}`);
+      .set('Authorization', `Bearer ${body.access_token}`);
 
     expect(response.statusCode).toEqual(400);
     const validationResponseBody: unknown = response.body;
@@ -660,7 +690,7 @@ describe('SendController (e2e)', () => {
 
     expect(validationResponseBody.message).toHaveLength(1);
     expect(validationResponseBody.message[0]).toEqual('to must be an email');
-    expect(validationResponseBody.error).toEqual("Bad Request");
+    expect(validationResponseBody.error).toEqual('Bad Request');
     expect(validationResponseBody.statusCode).toEqual(400);
   });
 });
