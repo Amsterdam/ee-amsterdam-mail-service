@@ -1,4 +1,4 @@
-import type { SecretClient } from "@azure/keyvault-secrets";
+import type { SecretClient } from '@azure/keyvault-secrets';
 
 export const deleteCredentials = async (client: SecretClient) => {
   try {
@@ -36,5 +36,17 @@ export function assertIsValidationResponseBody(
     !('statusCode' in obj)
   ) {
     throw new Error('Is not a validation response body!');
+  }
+}
+
+export interface ValidResponseBody {
+  message: string;
+}
+
+export function assertIsValidResponseBody(
+  obj: any,
+): asserts obj is ValidResponseBody {
+  if (typeof obj !== 'object' || obj === null || !('message' in obj)) {
+    throw new Error('Is not a valid resonse body!');
   }
 }

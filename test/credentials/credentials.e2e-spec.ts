@@ -19,23 +19,17 @@ import {
 } from 'test/auth';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { SecretClient } from '@azure/keyvault-secrets';
-import { assertIsValidationResponseBody, deleteCredentials } from 'test/utils';
+import {
+  assertIsValidationResponseBody,
+  assertIsValidResponseBody,
+  deleteCredentials,
+} from 'test/utils';
 
 const requestBody = {
   username: 'test_smtp_user',
   password: 'smtp_secret',
 };
 const url = '/credentials';
-
-interface ValidResponseBody {
-  message: string;
-}
-
-function assertIsValidResponseBody(obj: any): asserts obj is ValidResponseBody {
-  if (typeof obj !== 'object' || obj === null || !('message' in obj)) {
-    throw new Error('Is not a valid resonse body!');
-  }
-}
 
 describe('CredentialsController (e2e)', () => {
   let app: INestApplication<App>;
