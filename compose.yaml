@@ -13,7 +13,7 @@ services:
       - ".:/app"
 
   mail-service:
-    image: amsterdam/amsterdam-mail-service:latest
+    image: amsterdamsoftwareontwikkeling/amsterdam-mail-service:latest
     build:
       context: .
       dockerfile: Containerfile
