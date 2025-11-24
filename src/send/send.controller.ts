@@ -2,8 +2,9 @@ import { Body, Controller, HttpCode, Post, Req, Res } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
+  ApiNotFoundResponse,
   ApiOAuth2,
-  ApiResponse,
+  ApiOkResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
@@ -26,7 +27,7 @@ export class SendController {
   @Post()
   @HttpCode(200)
   @ApiBody({ type: SendRequestDto })
-  @ApiResponse({ type: SendResponseDto })
+  @ApiOkResponse({ type: SendResponseDto })
   @ApiBadRequestResponse({
     headers: {
       'www-authenticate': {
@@ -40,6 +41,10 @@ export class SendController {
         description: 'Contains information on authentication failures',
       },
     },
+  })
+  @ApiNotFoundResponse({
+    description: 'Credentials not found',
+    type: SendResponseDto,
   })
   public async send(
     @Req() request: Request,
