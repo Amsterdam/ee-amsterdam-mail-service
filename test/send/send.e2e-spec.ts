@@ -1,12 +1,15 @@
+import request from 'supertest';
 import { MailpitClient } from 'mailpit-api';
 import { readFileSync } from 'fs';
 import { format } from 'util';
-import { beforeEach, describe, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { ValidationPipe, type INestApplication } from '@nestjs/common';
 import type { App } from 'supertest/types';
 import { Test, type TestingModule } from '@nestjs/testing';
 import { AppModule } from 'src/app.module';
 import {
+  assertIsTokenResponseBody,
+  getToken,
   test_expired_token,
   test_header_missing_alg,
   test_header_missing_alg_and_typ,
@@ -18,6 +21,8 @@ import {
   test_invalid_typ_header,
   test_no_token_provided,
 } from 'test/auth';
+import { deleteCredentials } from 'test/utils';
+import { SecretClient } from '@azure/keyvault-secrets';
 
 const mailpitClient = new MailpitClient('http://mailpit:8025');
 const from = 'me@example.com';
@@ -91,5 +96,582 @@ describe('SendController (e2e)', () => {
 
   it('It should not send mail with a invalid issuer in the access token', async () => {
     await test_invalid_issuer(app, url, requestBody);
+  });
+
+  it("It should send mail with a valid token", async () => {
+    await mailpitClient.deleteMessages();
+
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
+
+    const credentialsResponse = await request(app.getHttpServer())
+      .post("/credentials")
+      .send({ username: "test_smtp_user", password: "smtp_secret" })
+      .set("Authorization", `Bearer ${body.access_token}`);
+
+    expect(credentialsResponse.statusCode).toEqual(200);
+
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send(requestBody)
+      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+
+    expect(response.statusCode).toEqual(200);
+    expect(response.body).toHaveProperty("message");
+    expect(response.body.message).toEqual("Mail sent successfully!");
+
+    const mailpitResponse = await mailpitClient.listMessages();
+    expect(mailpitResponse.total).toEqual(1);
+
+    const messageSummary = mailpitResponse.messages[0];
+    expect(messageSummary.From.Address).toEqual(from);
+    expect(messageSummary.To).toHaveLength(1);
+    expect(messageSummary.To[0].Address).toEqual(to);
+    expect(messageSummary.Subject).toEqual(subject);
+
+    const messageText = await mailpitClient.renderMessageText(
+      messageSummary.ID,
+    );
+    expect(messageText).toEqual(expectedText);
+
+    const messageHtml = await mailpitClient.renderMessageHTML(
+      messageSummary.ID,
+    );
+    expect(messageHtml).toEqual(getExpectedHtml(messageSummary.ID));
+
+    const searchResponse = await mailpitClient.searchMessages({
+      query: "has:inline",
+    });
+    expect(searchResponse.messages_count).toEqual(1);
+
+    await deleteCredentials(app.get(SecretClient));
+  });
+
+  it("It should not send mail with authentication enabled and a valid token, but no credentials in keyvault", async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
+
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send(requestBody)
+      .set("Authorization", `Bearer ${body.access_token}`);
+
+    expect(response.statusCode).toEqual(404);
+    expect(response.body).toHaveProperty("message");
+    expect(response.body.message).toEqual(
+      "Credentials not found. Did you add them using the /credentials endpoint?",
+    );
+  });
+
+  it("title missing", async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
+
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send({
+        previewText: "preview text",
+        bodyText: "body text",
+        from: "me@example.com",
+        to: "you@example.com",
+        subject: "subject",
+      })
+      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+
+    expect(response.statusCode).toEqual(422);
+    expect(response.body).toHaveProperty("errors");
+    expect(response.body.errors).toHaveLength(1);
+    expect(response.body.errors[0].path).toEqual("title");
+    expect(response.body.errors[0].errorCode).toEqual(
+      "required.openapi.requestValidation",
+    );
+    expect(response.body.errors[0].message).toEqual(
+      "must have required property 'title'",
+    );
+    expect(response.body.errors[0].location).toEqual("body");
+  });
+
+  it("title too short", async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
+
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send({
+        title: "a",
+        previewText: "preview text",
+        bodyText: "body text",
+        from: "me@example.com",
+        to: "you@example.com",
+        subject: "subject",
+      })
+      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+
+    expect(response.statusCode).toEqual(422);
+    expect(response.body).toHaveProperty("errors");
+    expect(response.body.errors).toHaveLength(1);
+    expect(response.body.errors[0].path).toEqual("title");
+    expect(response.body.errors[0].errorCode).toEqual(
+      "minLength.openapi.requestValidation",
+    );
+    expect(response.body.errors[0].message).toEqual(
+      "must NOT have fewer than 2 characters",
+    );
+    expect(response.body.errors[0].location).toEqual("body");
+  });
+
+  it("title wrong type", async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
+
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send({
+        title: false,
+        previewText: "preview text",
+        bodyText: "body text",
+        from: "me@example.com",
+        to: "you@example.com",
+        subject: "subject",
+      })
+      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+
+    expect(response.statusCode).toEqual(422);
+    expect(response.body).toHaveProperty("errors");
+    expect(response.body.errors).toHaveLength(1);
+    expect(response.body.errors[0].path).toEqual("title");
+    expect(response.body.errors[0].message).toEqual("must be string");
+    expect(response.body.errors[0].location).toEqual("body");
+  });
+
+  it("previewText missing", async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
+
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send({
+        title: "title",
+        bodyText: "body text",
+        from: "me@example.com",
+        to: "you@example.com",
+        subject: "subject",
+      })
+      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+
+    expect(response.statusCode).toEqual(422);
+    expect(response.body).toHaveProperty("errors");
+    expect(response.body.errors).toHaveLength(1);
+    expect(response.body.errors[0].path).toEqual("previewText");
+    expect(response.body.errors[0].errorCode).toEqual(
+      "required.openapi.requestValidation",
+    );
+    expect(response.body.errors[0].message).toEqual(
+      "must have required property 'previewText'",
+    );
+    expect(response.body.errors[0].location).toEqual("body");
+  });
+
+  it("previewText too short", async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
+
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send({
+        title: "title",
+        previewText: "a",
+        bodyText: "body text",
+        from: "me@example.com",
+        to: "you@example.com",
+        subject: "subject",
+      })
+      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+
+    expect(response.statusCode).toEqual(422);
+    expect(response.body).toHaveProperty("errors");
+    expect(response.body.errors).toHaveLength(1);
+    expect(response.body.errors[0].path).toEqual("previewText");
+    expect(response.body.errors[0].errorCode).toEqual(
+      "minLength.openapi.requestValidation",
+    );
+    expect(response.body.errors[0].message).toEqual(
+      "must NOT have fewer than 2 characters",
+    );
+    expect(response.body.errors[0].location).toEqual("body");
+  });
+
+  it("previewText wrong type", async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
+
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send({
+        title: "title",
+        previewText: false,
+        bodyText: "body text",
+        from: "me@example.com",
+        to: "you@example.com",
+        subject: "subject",
+      })
+      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+
+    expect(response.statusCode).toEqual(422);
+    expect(response.body).toHaveProperty("errors");
+    expect(response.body.errors).toHaveLength(1);
+    expect(response.body.errors[0].path).toEqual("previewText");
+    expect(response.body.errors[0].message).toEqual("must be string");
+    expect(response.body.errors[0].location).toEqual("body");
+  });
+
+  it("bodyText missing", async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
+
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send({
+        title: "title",
+        previewText: "preview text",
+        from: "me@example.com",
+        to: "you@example.com",
+        subject: "subject",
+      })
+      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+
+    expect(response.statusCode).toEqual(422);
+    expect(response.body).toHaveProperty("errors");
+    expect(response.body.errors).toHaveLength(1);
+    expect(response.body.errors[0].path).toEqual("bodyText");
+    expect(response.body.errors[0].errorCode).toEqual(
+      "required.openapi.requestValidation",
+    );
+    expect(response.body.errors[0].message).toEqual(
+      "must have required property 'bodyText'",
+    );
+    expect(response.body.errors[0].location).toEqual("body");
+  });
+
+  it("bodyText too short", async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
+
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send({
+        title: "title",
+        previewText: "preview text",
+        bodyText: "a",
+        from: "me@example.com",
+        to: "you@example.com",
+        subject: "subject",
+      })
+      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+
+    expect(response.statusCode).toEqual(422);
+    expect(response.body).toHaveProperty("errors");
+    expect(response.body.errors).toHaveLength(1);
+    expect(response.body.errors[0].path).toEqual("bodyText");
+    expect(response.body.errors[0].errorCode).toEqual(
+      "minLength.openapi.requestValidation",
+    );
+    expect(response.body.errors[0].message).toEqual(
+      "must NOT have fewer than 2 characters",
+    );
+    expect(response.body.errors[0].location).toEqual("body");
+  });
+
+  it("bodyText wrong type", async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
+
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send({
+        title: "title",
+        previewText: "preview text",
+        bodyText: false,
+        from: "me@example.com",
+        to: "you@example.com",
+        subject: "subject",
+      })
+      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+
+    expect(response.statusCode).toEqual(422);
+    expect(response.body).toHaveProperty("errors");
+    expect(response.body.errors).toHaveLength(1);
+    expect(response.body.errors[0].path).toEqual("bodyText");
+    expect(response.body.errors[0].message).toEqual("must be string");
+    expect(response.body.errors[0].location).toEqual("body");
+  });
+
+  it("subject missing", async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
+
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send({
+        title: "title",
+        previewText: "preview text",
+        bodyText: "body text",
+        from: "me@example.com",
+        to: "you@example.com",
+      })
+      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+
+    expect(response.statusCode).toEqual(422);
+    expect(response.body).toHaveProperty("errors");
+    expect(response.body.errors).toHaveLength(1);
+    expect(response.body.errors[0].path).toEqual("subject");
+    expect(response.body.errors[0].errorCode).toEqual(
+      "required.openapi.requestValidation",
+    );
+    expect(response.body.errors[0].message).toEqual(
+      "must have required property 'subject'",
+    );
+    expect(response.body.errors[0].location).toEqual("body");
+  });
+
+  it("subject too short", async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
+
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send({
+        title: "title",
+        previewText: "preview text",
+        bodyText: "body text",
+        from: "me@example.com",
+        to: "you@example.com",
+        subject: "s",
+      })
+      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+
+    expect(response.statusCode).toEqual(422);
+    expect(response.body).toHaveProperty("errors");
+    expect(response.body.errors).toHaveLength(1);
+    expect(response.body.errors[0].path).toEqual("subject");
+    expect(response.body.errors[0].errorCode).toEqual(
+      "minLength.openapi.requestValidation",
+    );
+    expect(response.body.errors[0].message).toEqual(
+      "must NOT have fewer than 2 characters",
+    );
+    expect(response.body.errors[0].location).toEqual("body");
+  });
+
+  it("subject wrong type", async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
+
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send({
+        title: "title",
+        previewText: "preview text",
+        bodyText: "body text",
+        from: "me@example.com",
+        to: "you@example.com",
+        subject: false,
+      })
+      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+
+    expect(response.statusCode).toEqual(422);
+    expect(response.body).toHaveProperty("errors");
+    expect(response.body.errors).toHaveLength(1);
+    expect(response.body.errors[0].path).toEqual("subject");
+    expect(response.body.errors[0].message).toEqual("must be string");
+    expect(response.body.errors[0].location).toEqual("body");
+  });
+
+  it("from missing", async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
+
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send({
+        title: "title",
+        previewText: "preview text",
+        bodyText: "body text",
+        to: "you@example.com",
+        subject: "subject",
+      })
+      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+
+    expect(response.statusCode).toEqual(422);
+    expect(response.body).toHaveProperty("errors");
+    expect(response.body.errors).toHaveLength(1);
+    expect(response.body.errors[0].path).toEqual("from");
+    expect(response.body.errors[0].errorCode).toEqual(
+      "required.openapi.requestValidation",
+    );
+    expect(response.body.errors[0].message).toEqual(
+      "must have required property 'from'",
+    );
+    expect(response.body.errors[0].location).toEqual("body");
+  });
+
+  it("from wrong type", async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
+
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send({
+        title: "title",
+        previewText: "preview text",
+        bodyText: "body text",
+        from: false,
+        to: "you@example.com",
+        subject: "subject",
+      })
+      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+
+    expect(response.statusCode).toEqual(422);
+    expect(response.body).toHaveProperty("errors");
+    expect(response.body.errors).toHaveLength(1);
+    expect(response.body.errors[0].path).toEqual("from");
+    expect(response.body.errors[0].message).toEqual("must be string");
+    expect(response.body.errors[0].location).toEqual("body");
+    expect(response.body.errors[0].errorCode).toEqual(
+      "type.openapi.requestValidation",
+    );
+  });
+
+  it("from not valid email address", async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
+
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send({
+        title: "title",
+        previewText: "preview text",
+        bodyText: "body text",
+        from: "hello",
+        to: "you@example.com",
+        subject: "subject",
+      })
+      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+
+    expect(response.statusCode).toEqual(422);
+    expect(response.body).toHaveProperty("errors");
+    expect(response.body.errors).toHaveLength(1);
+    expect(response.body.errors[0].path).toEqual("from");
+    expect(response.body.errors[0].message).toEqual(
+      'must match format "email"',
+    );
+    expect(response.body.errors[0].location).toEqual("body");
+    expect(response.body.errors[0].errorCode).toEqual(
+      "format.openapi.requestValidation",
+    );
+  });
+
+  it("to missing", async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
+
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send({
+        title: "title",
+        previewText: "preview text",
+        bodyText: "body text",
+        from: "you@example.com",
+        subject: "subject",
+      })
+      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+
+    expect(response.statusCode).toEqual(422);
+    expect(response.body).toHaveProperty("errors");
+    expect(response.body.errors).toHaveLength(1);
+    expect(response.body.errors[0].path).toEqual("to");
+    expect(response.body.errors[0].errorCode).toEqual(
+      "required.openapi.requestValidation",
+    );
+    expect(response.body.errors[0].message).toEqual(
+      "must have required property 'to'",
+    );
+    expect(response.body.errors[0].location).toEqual("body");
+  });
+
+  it("to wrong type", async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
+
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send({
+        title: "title",
+        previewText: "preview text",
+        bodyText: "body text",
+        to: false,
+        from: "you@example.com",
+        subject: "subject",
+      })
+      .set("Authorization", `Bearer ${tokenResponse.body.access_token}`);
+
+    expect(response.statusCode).toEqual(422);
+    expect(response.body).toHaveProperty("errors");
+    expect(response.body.errors).toHaveLength(1);
+    expect(response.body.errors[0].path).toEqual("to");
+    expect(response.body.errors[0].message).toEqual("must be string");
+    expect(response.body.errors[0].location).toEqual("body");
+    expect(response.body.errors[0].errorCode).toEqual(
+      "type.openapi.requestValidation",
+    );
+  });
+
+  it("to not valid email address", async () => {
+    const tokenResponse = await getToken();
+    const body: unknown = tokenResponse.body;
+    assertIsTokenResponseBody(body);
+
+    const response = await request(app.getHttpServer())
+      .post(url)
+      .send({
+        title: "title",
+        previewText: "preview text",
+        bodyText: "body text",
+        to: "hello",
+        from: "you@example.com",
+        subject: "subject",
+      })
+      .set("Authorization", `Bearer ${body.access_token}`);
+
+    expect(response.statusCode).toEqual(422);
+    expect(response.body).toHaveProperty("errors");
+    expect(response.body.errors).toHaveLength(1);
+    expect(response.body.errors[0].path).toEqual("to");
+    expect(response.body.errors[0].message).toEqual(
+      'must match format "email"',
+    );
+    expect(response.body.errors[0].location).toEqual("body");
+    expect(response.body.errors[0].errorCode).toEqual(
+      "format.openapi.requestValidation",
+    );
   });
 });
