@@ -1,4 +1,15 @@
 services:
+  react-email:
+    build:
+      context: .
+      dockerfile: Containerfile
+    command: ["yarn", "run", "email"]
+    environment:
+      NODE_ENV: development
+    ports:
+      - "3000:3000"
+    volumes:
+      - ".:/app"
 
   mail-service:
     image: amsterdam/amsterdam-mail-service:latest
