@@ -3473,10 +3473,10 @@
   dependencies:
     tslib "^2.8.0"
 
-"@swc/plugin-transform-imports@^10.0.0":
-  version "10.0.0"
-  resolved "https://registry.yarnpkg.com/@swc/plugin-transform-imports/-/plugin-transform-imports-10.0.0.tgz#880539c9a607c9d38c4bc95bf755a1581669ccbc"
-  integrity sha512-L20i7gidyCgN1pZwmZwn25WLMwjzM2r90vy0BUU4iOUz6a60HlAjYVACCGIR+hj5cNjUnxhnzTPawN5M92SFMQ==
+"@swc/plugin-transform-imports@^12.4.0":
+  version "12.4.0"
+  resolved "https://registry.yarnpkg.com/@swc/plugin-transform-imports/-/plugin-transform-imports-12.4.0.tgz#4b90d2a273bfc5f2bcfa784e6980559873bf2cd2"
+  integrity sha512-jYd7GYCODDgxRNE0YayZzGPkKRaJjN7iNzndsdR3amutJlV6HS2h89S2851g2RPkO1upSu7xfDH0lSxq3zlg/g==
   dependencies:
     "@swc/counter" "^0.1.3"
 
