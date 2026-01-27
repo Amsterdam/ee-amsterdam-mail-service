@@ -36,8 +36,8 @@
     "class-validator": "^0.14.2",
     "joi": "^18.0.1",
     "nodemailer": "^7.0.11",
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
     "react-email": "5.1.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
