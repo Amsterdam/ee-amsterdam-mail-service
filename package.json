@@ -74,5 +74,8 @@
     "unplugin-swc": "^1.5.8",
     "vitest": "^4.0.8",
     "webpack": "^5.104.1"
+  },
+  "resolutions": {
+    "lodash": "^4.17.23"
   }
 }
