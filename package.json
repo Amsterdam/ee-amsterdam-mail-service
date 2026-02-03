@@ -76,6 +76,7 @@
     "webpack": "^5.104.1"
   },
   "resolutions": {
-    "lodash": "^4.17.23"
+    "lodash": "^4.17.23",
+    "next": "^16.1.5"
   }
 }
