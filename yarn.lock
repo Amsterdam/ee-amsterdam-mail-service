@@ -2309,12 +2309,12 @@
   dependencies:
     marked "^15.0.12"
 
-"@react-email/preview-server@^5.2.2":
-  version "5.2.2"
-  resolved "https://registry.yarnpkg.com/@react-email/preview-server/-/preview-server-5.2.2.tgz#da04e51b371f3183e25046f5d9f7f69c436e6c0c"
-  integrity sha512-wdxN+kIWNgBoVpQUUIRgzn36qea5LI56oCFHKJIjyBWL0UloKicGQUUI4bmqcFsyHUK7p1NddG+UoJpWWyW2Vw==
+"@react-email/preview-server@^5.2.5":
+  version "5.2.5"
+  resolved "https://registry.yarnpkg.com/@react-email/preview-server/-/preview-server-5.2.5.tgz#694d16847f2395603dff61a5874acd6bb3f6487d"
+  integrity sha512-YERhEKl0Dz2qNbHTzdSwnsK15gipEqonKMPEbsoE8C+ACiHIm/f/d1UzQVmhrsN6PW7L+JhAuzcdIX1H3pLmFg==
   dependencies:
-    next "16.1.1"
+    next "16.0.10"
 
 "@react-email/preview@0.0.14":
   version "0.0.14"
@@ -5769,7 +5769,7 @@ neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-next@16.1.1, next@^16.1.5:
+next@16.0.10, next@^16.1.5:
   version "16.1.6"
   resolved "https://registry.yarnpkg.com/next/-/next-16.1.6.tgz#24a861371cbe211be7760d9a89ddf2415e3824de"
   integrity sha512-hkyRkcu5x/41KoqnROkfTm2pZVbKxvbZRuNvKXLRXxs3VfyO0WhY50TQS40EuKO9SW3rBj/sF3WbVwDACeMZyw==
