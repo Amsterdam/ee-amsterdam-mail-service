@@ -3633,7 +3633,7 @@ atomically@^2.0.3:
     stubborn-fs "^2.0.0"
     when-exit "^2.1.4"
 
-axios@^1.12.1:
+axios@^1.13.5:
   version "1.13.5"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.13.5.tgz#5e464688fa127e11a660a2c49441c009f6567a43"
   integrity sha512-cz4ur7Vb0xS4/KUN0tPWe44eqxrIu31me+fbang3ijiNscE129POzipJJA6zniq2C/Z6sJCjMimjS8Lc/GAs8Q==
@@ -5698,12 +5698,12 @@ magic-string@^0.30.21:
   dependencies:
     "@jridgewell/sourcemap-codec" "^1.5.5"
 
-mailpit-api@^1.5.4:
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/mailpit-api/-/mailpit-api-1.7.0.tgz#f59c6f9f7f91492170f30ca7250c4d640c7ba01c"
-  integrity sha512-O4GjmOSz40mcPepaSkNrhvdLjpkFlI1lBVOwiGqfiYpSIrBT1HvwUJRKHH+AEfl1LYzLTbhGduG+V9pI2T0Xhw==
+mailpit-api@^1.7.1:
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/mailpit-api/-/mailpit-api-1.7.1.tgz#d868126e11e717a5b311093813e9e00f85100e03"
+  integrity sha512-a4+shTeSYQiy5bADcsA/TXj+D9errJu9Z2ZE3vJAuI6sQxz9n/h3r/pVkKDyMIie6GsBXAzyooPl8X7hvXmnWQ==
   dependencies:
-    axios "^1.12.1"
+    axios "^1.13.5"
     partysocket "^1.1.10"
     ws "^8.18.3"
 
