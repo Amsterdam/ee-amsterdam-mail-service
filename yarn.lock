@@ -5748,10 +5748,10 @@ magic-string@^0.30.21:
   dependencies:
     "@jridgewell/sourcemap-codec" "^1.5.5"
 
-mailpit-api@^1.7.1:
-  version "1.7.1"
-  resolved "https://registry.yarnpkg.com/mailpit-api/-/mailpit-api-1.7.1.tgz#d868126e11e717a5b311093813e9e00f85100e03"
-  integrity sha512-a4+shTeSYQiy5bADcsA/TXj+D9errJu9Z2ZE3vJAuI6sQxz9n/h3r/pVkKDyMIie6GsBXAzyooPl8X7hvXmnWQ==
+mailpit-api@^1.7.2:
+  version "1.7.2"
+  resolved "https://registry.yarnpkg.com/mailpit-api/-/mailpit-api-1.7.2.tgz#29dd64c21347e775b8cc5b030b6e88955138fc30"
+  integrity sha512-bk8D84CoCL4ztXx0a+fDspLkJacU+dMM41LDFlbPQoYpynMzHm4jrtM6ECOKmw30xovv0Ap5WO8mdAGOK65WwQ==
   dependencies:
     axios "^1.13.5"
     partysocket "^1.1.10"
