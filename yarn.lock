@@ -2439,10 +2439,10 @@
   dependencies:
     marked "^15.0.12"
 
-"@react-email/preview-server@^5.2.8":
-  version "5.2.8"
-  resolved "https://registry.yarnpkg.com/@react-email/preview-server/-/preview-server-5.2.8.tgz#447fae9503ee32649bba7b57fd87df3336b96408"
-  integrity sha512-drQ0C7vi7P0uE7Ox1Cyiujsx0oqp2RbIscOdSBR5qvzw3EKjlGbW2pWjQ000cjxTq3Si7lqlRKhOIF8MzOnqHw==
+"@react-email/preview-server@^5.2.9":
+  version "5.2.9"
+  resolved "https://registry.yarnpkg.com/@react-email/preview-server/-/preview-server-5.2.9.tgz#773dbfbb9ab9c1f636a389d97f12b0833e3967c2"
+  integrity sha512-RlY4xmtBNR83iXY8ItxlWoG1k2TF3oOs0QjWWdcQ/azFsjlQqii1gHWbvNC4xlvcvdfwJRH51CvoRUG/SxAXVw==
   dependencies:
     esbuild "0.25.10"
     next "16.1.6"
