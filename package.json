@@ -21,7 +21,7 @@
   "dependencies": {
     "@azure/identity": "^4.13.0",
     "@azure/keyvault-secrets": "^4.10.0",
-    "@nestjs/common": "^11.1.8",
+    "@nestjs/common": "^11.1.16",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.16",
     "@nestjs/platform-express": "^11.1.8",
