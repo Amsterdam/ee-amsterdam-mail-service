@@ -19,7 +19,7 @@
     "test:e2e": "vitest --config vitest.config-e2e.ts"
   },
   "dependencies": {
-    "@azure/identity": "^4.13.0",
+    "@azure/identity": "^4.13.1",
     "@azure/keyvault-secrets": "^4.10.0",
     "@nestjs/common": "^11.1.16",
     "@nestjs/config": "^4.0.2",
