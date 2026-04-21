@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "ESNext",
     "lib": ["ESNext"],
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "declaration": true,
     "noImplicitAny": true,
     "removeComments": true,
