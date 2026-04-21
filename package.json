@@ -48,7 +48,7 @@
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.1.19",
-    "@react-email/preview-server": "^5.2.9",
+    "@react-email/ui": "^6.0.0",
     "@swc/cli": "^0.8.0",
     "@swc/core": "1.15.30",
     "@swc/plugin-transform-imports": "^12.3.0",
