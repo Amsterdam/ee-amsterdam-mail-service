@@ -2322,10 +2322,10 @@
   dependencies:
     tslib "^2.8.0"
 
-"@swc/plugin-transform-imports@^12.3.0":
-  version "12.8.0"
-  resolved "https://registry.yarnpkg.com/@swc/plugin-transform-imports/-/plugin-transform-imports-12.8.0.tgz#eae6bb5f2b46d8a94b58b788634b93c5615fe0ac"
-  integrity sha512-5/iZPNxrQlBpKRWLmLjk+YUBXJ5uob5CYUeWEV5Rre/HqPNtsdKS7lv8cz+0b6xFZ9iggxQ+GOAmAReYxal73A==
+"@swc/plugin-transform-imports@^12.9.0":
+  version "12.9.0"
+  resolved "https://registry.yarnpkg.com/@swc/plugin-transform-imports/-/plugin-transform-imports-12.9.0.tgz#7cc06d1d97ae615013adc6c30d42f4245a82cf0c"
+  integrity sha512-fae+YEkyZfFLclzUUaSBPJ8vK5Wk7NVjxNP3Yz6FMwVJNO4Z/8gkAkskjFZYLuQCglUMc+OqivD0mAUeEUHHCg==
   dependencies:
     "@swc/counter" "^0.1.3"
 
