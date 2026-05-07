@@ -51,7 +51,7 @@
     "@react-email/ui": "^6.0.0",
     "@swc/cli": "^0.8.0",
     "@swc/core": "1.15.30",
-    "@swc/plugin-transform-imports": "^12.3.0",
+    "@swc/plugin-transform-imports": "^12.9.0",
     "@types/express": "^5.0.5",
     "@types/node": "^25.4.0",
     "@types/nodemailer": "^7.0.9",
