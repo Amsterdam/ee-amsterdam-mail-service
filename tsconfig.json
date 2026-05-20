@@ -31,7 +31,6 @@
     "noEmitHelpers": true,
     "noUncheckedIndexedAccess": true,
     "outDir": "./dist",
-    "baseUrl": "./",
     "incremental": true,
     "strict": true,
     "strictNullChecks": true,
