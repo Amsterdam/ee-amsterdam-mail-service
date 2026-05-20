@@ -95,7 +95,7 @@ services:
       - amsterdam-mail-service
 
   collector:
-    image: otel/opentelemetry-collector-contrib:0.138.0
+    image: otel/opentelemetry-collector-contrib:0.152.0
     ports:
       - "4317:4317"
     volumes:
