@@ -24,7 +24,7 @@
     "@nestjs/common": "^11.1.17",
     "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.1.18",
-    "@nestjs/platform-express": "^11.1.17",
+    "@nestjs/platform-express": "^11.1.24",
     "@nestjs/serve-static": "^5.0.4",
     "@nestjs/swagger": ">11.1.6 <11.2.1 || ^11.2.2",
     "@okta/jwt-verifier": "^4.0.2",
