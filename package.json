@@ -26,7 +26,7 @@
     "@nestjs/core": "^11.1.18",
     "@nestjs/platform-express": "^11.1.24",
     "@nestjs/serve-static": "^5.0.4",
-    "@nestjs/swagger": ">11.1.6 <11.2.1 || ^11.2.2",
+    "@nestjs/swagger": ">11.1.6 <11.4.5 || ^11.2.2",
     "@okta/jwt-verifier": "^4.0.2",
     "@opentelemetry/api": "^1.9.1",
     "@opentelemetry/auto-instrumentations-node": "^0.76",
