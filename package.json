@@ -72,7 +72,7 @@
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.58.0",
     "unplugin-swc": "^1.5.8",
-    "vitest": "^4.1.5",
+    "vitest": "^4.1.9",
     "webpack": "^5.107.2"
   },
   "resolutions": {
