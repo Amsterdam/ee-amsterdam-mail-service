@@ -5263,10 +5263,10 @@ magic-string@^0.30.21:
   dependencies:
     "@jridgewell/sourcemap-codec" "^1.5.5"
 
-mailpit-api@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/mailpit-api/-/mailpit-api-2.0.0.tgz#f922eaf7e06209b4b2b0ef7d367da0ce8eb1aec8"
-  integrity sha512-zK68B0CRVZaJS1PaX7omFhKUKSLp4JMMpAUTRYbCmcrgJ9nguIh4sS+RRUyFeW1nykDNH8PVlRz/WSXsq9ZqlQ==
+mailpit-api@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/mailpit-api/-/mailpit-api-2.1.0.tgz#03388b3793f779d6591b2920048d662e16baf47a"
+  integrity sha512-ZZG5ShQS2E5QH9p1xeD2U2sfahKEEgRvtzIlJXsLUtLSUbYjmxPeuvciwayj0oxA+hn85xzIEt1v8FsXtwqKCA==
 
 make-asynchronous@^1.0.1:
   version "1.1.0"
