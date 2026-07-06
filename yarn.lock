@@ -2085,10 +2085,10 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.1.tgz#eaee5900122c110a3dbcb728c0597014a2621774"
   integrity sha512-oOAWABowe8EAbMyWKM0tYDKi8Yaox52D+HWZhAIJqQXbqe0xI/GV7FhLWqlEKreMkfDjshR5FKgi3mnle0h6Eg==
 
-"@react-email/render@>=2.0.8":
-  version "2.0.8"
-  resolved "https://registry.yarnpkg.com/@react-email/render/-/render-2.0.8.tgz#84131ab5622b89805b1c798d77dc0921da912eda"
-  integrity sha512-5udvVr3U/WuGJZfLdLBOhkzrqRWd2Q5ZYmF7ppcy7FzWcwgshdqLMNqJOXcVzAXJXg/2bm7D+WGJzTtZOZMQnQ==
+"@react-email/render@>=2.0.10":
+  version "2.0.10"
+  resolved "https://registry.yarnpkg.com/@react-email/render/-/render-2.0.10.tgz#248e926ed03cc035d4ecaa5f42fd959898d7dc93"
+  integrity sha512-QbgVvXeYenVi0LqkO+upcZzbyrD5Tz2wwCV+6CSzgo6ZsvwHLjf0x5Sr1C7DepcMhjYo++maJWRbcSoKMXKr1g==
   dependencies:
     html-to-text "^9.0.5"
     prettier "^3.5.3"
@@ -5956,14 +5956,14 @@ react-dom@19.2.7:
   dependencies:
     scheduler "^0.27.0"
 
-react-email@^6.5.0:
-  version "6.5.0"
-  resolved "https://registry.yarnpkg.com/react-email/-/react-email-6.5.0.tgz#973a2bc21162353e7e2968e5bf0f3bf9fdb0c0fb"
-  integrity sha512-WrJ+XPW87O1dabF4RJNGnTr7VTGsNa+BlMiinAZdH5fg8Kepwk++ZzX+LEieTlk+a3r13TaTJ4DfI9gv++y02g==
+react-email@^6.6.6:
+  version "6.6.6"
+  resolved "https://registry.yarnpkg.com/react-email/-/react-email-6.6.6.tgz#acd2a26a2b5bbc0201f7c468e9cff15fd979a770"
+  integrity sha512-4eYmISIQbmEzibkl8pW+ZQHIFMwUVqZQRpTDYj6Ow7kk/gpUjtA95ggxoXji8pRq/y76tOhe7D3vNUJkZWO58g==
   dependencies:
     "@babel/parser" "7.27.0"
     "@babel/traverse" "7.27.0"
-    "@react-email/render" ">=2.0.8"
+    "@react-email/render" ">=2.0.10"
     chokidar "^4.0.3"
     commander "^13.0.0"
     conf "^15.0.2"
