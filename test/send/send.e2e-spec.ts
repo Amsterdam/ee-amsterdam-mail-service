@@ -37,7 +37,7 @@ const getExpectedHtml = (id: string): string => {
   const expected = readFileSync('./test/resources/sendMailBody.html', {
     encoding: 'utf-8',
   });
-  return format(expected, id, id);
+  return format(expected, id);
 };
 const requestBody = {
   title: 'My Title',
