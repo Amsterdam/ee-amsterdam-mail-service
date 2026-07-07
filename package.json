@@ -76,6 +76,7 @@
     "webpack": "^5.108.4"
   },
   "resolutions": {
-    "multer": "^2.2.0"
+    "multer": "^2.2.0",
+    "uuid": "^14.0.1"
   }
 }
