@@ -2307,7 +2307,7 @@
     html-to-text "^9.0.5"
     prettier "^3.5.3"
 
-"@react-email/ui@^6.0.1":
+"@react-email/ui@^6.6.6":
   version "6.6.6"
   resolved "https://registry.yarnpkg.com/@react-email/ui/-/ui-6.6.6.tgz#03148df544d2d16c4cd7eb0b314f52740bcb5eea"
   integrity sha512-mupCOgV0sC94ODcYGwqj7CD0RAonBgaeeMxnu8DYA9JPFH8hx1061X87itIKL1OVxoBW3IftjvsECuMfqUilwg==
