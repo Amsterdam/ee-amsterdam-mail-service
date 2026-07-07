@@ -76,6 +76,7 @@
     "webpack": "^5.108.4"
   },
   "resolutions": {
+    "esbuild": "^0.28.1",
     "multer": "^2.2.0",
     "postcss": "^8.5.16",
     "uuid": "^14.0.1"
