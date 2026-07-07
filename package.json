@@ -75,5 +75,7 @@
     "vitest": "^4.1.9",
     "webpack": "^5.108.4"
   },
-  "resolutions": {}
+  "resolutions": {
+    "multer": "^2.2.0"
+  }
 }
