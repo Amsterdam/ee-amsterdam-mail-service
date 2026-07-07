@@ -73,11 +73,11 @@
     "typescript-eslint": "^8.63.0",
     "unplugin-swc": "^1.5.8",
     "vitest": "^4.1.9",
-    "webpack": "^5.107.2"
+    "webpack": "^5.108.4"
   },
   "resolutions": {
     "lodash": "^4.17.23",
     "next": "^16.2.6",
-    "webpack": "^5.107.2"
+    "webpack": "^5.108.4"
   }
 }
