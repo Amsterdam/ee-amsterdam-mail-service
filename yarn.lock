@@ -2177,12 +2177,12 @@
     html-to-text "^9.0.5"
     prettier "^3.5.3"
 
-"@react-email/ui@^6.6.6":
-  version "6.6.6"
-  resolved "https://registry.yarnpkg.com/@react-email/ui/-/ui-6.6.6.tgz#03148df544d2d16c4cd7eb0b314f52740bcb5eea"
-  integrity sha512-mupCOgV0sC94ODcYGwqj7CD0RAonBgaeeMxnu8DYA9JPFH8hx1061X87itIKL1OVxoBW3IftjvsECuMfqUilwg==
+"@react-email/ui@^6.8.1":
+  version "6.8.1"
+  resolved "https://registry.yarnpkg.com/@react-email/ui/-/ui-6.8.1.tgz#58ff6cb38bac310dbd9bcc71429f597a6a89850a"
+  integrity sha512-HnHsUBqhFoWAXZkhGqot88dBxoprUUqYF5XSei/OOI/PsMCOl6b39+HCGEQN2qzTZq335qs2s14pnpVgSCJ8nA==
   dependencies:
-    esbuild "0.28.0"
+    esbuild "0.28.1"
     next "16.2.6"
 
 "@rolldown/binding-android-arm64@1.1.4":
@@ -4062,7 +4062,7 @@ es-set-tostringtag@^2.1.0:
     has-tostringtag "^1.0.2"
     hasown "^2.0.2"
 
-esbuild@0.28.0, esbuild@^0.28.0, esbuild@^0.28.1:
+esbuild@0.28.1, esbuild@^0.28.0, esbuild@^0.28.1:
   version "0.28.1"
   resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.28.1.tgz#ef45b4634c9c9d97a296aea4114a5f9840f95578"
   integrity sha512-HrJrvZv5ayxBzPfwphOoNzkzOIIlifzk0KJrGK2c8R4+LKpMtpYLQeUdjnwjWv/LZlkH2laZk+4w78pi99D4Vw==
