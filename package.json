@@ -72,6 +72,7 @@
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.65.0",
     "unplugin-swc": "^1.5.8",
+    "vite": "^8.2.2",
     "vitest": "^5.0.0",
     "webpack": "^5.108.4"
   },
