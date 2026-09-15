@@ -21,12 +21,12 @@
   "dependencies": {
     "@azure/identity": "^4.13.2",
     "@azure/keyvault-secrets": "^4.10.0",
-    "@nestjs/common": "^11.2.3",
+    "@nestjs/common": "^12.0.3",
     "@nestjs/config": "^12.0.0",
-    "@nestjs/core": "^11.1.28",
-    "@nestjs/platform-express": "^11.1.28",
-    "@nestjs/serve-static": "^5.0.4",
-    "@nestjs/swagger": ">11.1.6 <11.4.5 || ^11.2.2",
+    "@nestjs/core": "^12.0.3",
+    "@nestjs/platform-express": "^12.0.3",
+    "@nestjs/serve-static": "^12.0.0",
+    "@nestjs/swagger": "^12.0.1",
     "@okta/jwt-verifier": "^4.0.2",
     "@opentelemetry/api": "^1.9.1",
     "@opentelemetry/auto-instrumentations-node": "^0.80",
@@ -45,9 +45,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@nestjs/cli": "^12.0.0",
-    "@nestjs/schematics": "^11.0.0",
-    "@nestjs/testing": "^11.2.1",
+    "@nestjs/cli": "^12.0.1",
+    "@nestjs/schematics": "^12.0.2",
+    "@nestjs/testing": "^12.0.3",
     "@react-email/ui": "^6.9.1",
     "@swc/cli": "^0.8.0",
     "@swc/core": "1.16.1",
@@ -75,16 +75,5 @@
     "vite": "^8.2.2",
     "vitest": "^5.0.0",
     "webpack": "^5.108.4"
-  },
-  "resolutions": {
-    "**/brace-expansion@>=0.0.1 <1.1.18": "^1.1.18",
-    "**/brace-expansion@>=2.0.0 <2.1.4": "^2.1.4",
-    "**/brace-expansion@>=4.0.0 <5.0.9": "^5.0.9",
-    "esbuild": "^0.28.1",
-    "js-yaml": "^4.3.1",
-    "multer": "^2.2.0",
-    "next": "^16.3.3",
-    "postcss": "^8.5.16",
-    "uuid": "^14.0.1"
   }
 }
