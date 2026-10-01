@@ -15,7 +15,7 @@ export class TransporterFactory {
   public produce(
     smtpUsername: string,
     smtpPassword: string,
-  ): Transporter<SMTPTransport.SentMessageInfo, SMTPTransport.Options> {
+  ): Transporter<SMTPTransport.SentMessageInfo> {
     return nodemailer.createTransport(
       `smtp://${this.smtpHost}:${this.smtpPort}`,
       {
@@ -88,10 +88,7 @@ export class Renderer {
 
 export class Mailer {
   public constructor(
-    private transporter: Transporter<
-      SMTPTransport.SentMessageInfo,
-      SMTPTransport.Options
-    >,
+    private transporter: Transporter<SMTPTransport.SentMessageInfo>,
   ) {}
 
   public async mail(
