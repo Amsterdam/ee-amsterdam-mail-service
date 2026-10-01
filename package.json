@@ -54,7 +54,6 @@
     "@swc/plugin-transform-imports": "^14.0.0",
     "@types/express": "^5.0.5",
     "@types/node": "^26.6.3",
-    "@types/nodemailer": "^8.0.0",
     "@types/react": "^19.3.0",
     "@types/supertest": "^7.2.0",
     "eslint": "^10.8.0",
