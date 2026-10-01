@@ -36,7 +36,7 @@
     "joi": "^18.2.5",
     "lodash": "^4.17.23",
     "next": "^16.3.6",
-    "nodemailer": "^9.1.1",
+    "nodemailer": "^10.0.9",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-email": "^6.9.5",
