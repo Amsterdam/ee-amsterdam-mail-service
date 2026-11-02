@@ -74,7 +74,7 @@
     "unplugin-swc": "^1.5.8",
     "vite": "^8.3.4",
     "vitest": "^5.0.0",
-    "webpack": "^5.111.1"
+    "webpack": "^5.112.2"
   },
   "resolutions": {
     "uuid": "^14.0.1"
