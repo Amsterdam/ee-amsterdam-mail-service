@@ -5073,10 +5073,10 @@ magic-string@^1.4.3:
   dependencies:
     "@jridgewell/sourcemap-codec" "^1.6.0"
 
-mailpit-api@^2.1.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/mailpit-api/-/mailpit-api-2.2.0.tgz#516a51111cc1d33fad7206037cd2a29a176b3ee3"
-  integrity sha512-4VupmmxiVHh16aifq0rTmneK/LoQS+DyzyMY/BGSw5tHVsHAe2b4ioe/JmTnYlNHcENObMEFJbtnlfh7aKq1yA==
+mailpit-api@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/mailpit-api/-/mailpit-api-2.3.0.tgz#f4f454dccb398063524f0f0c55f8825d041e9138"
+  integrity sha512-mSyf2I/k0PIUXjPR6pfUnvThO4jyaDT7qhhrP0cBW6lRhNG5HZ4NHBv/hbTdjlkz9gnaziLxae6G7dzKeJaiVQ==
 
 make-asynchronous@^1.0.1:
   version "1.1.0"
